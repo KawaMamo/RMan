@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="515.0" prefWidth="788.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="HelloController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="93.0" minHeight="57.0" prefHeight="57.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="407.0" minHeight="10.0" prefHeight="407.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="407.0" minHeight="10.0" prefHeight="407.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="94.0" minHeight="51.0" prefHeight="51.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Button fx:id="dataEntryBtn" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#dataEntry" prefHeight="374.0" prefWidth="254.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <graphic>
+            <ImageView fitHeight="169.0" fitWidth="169.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/36236-200.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#browser" prefHeight="374.0" prefWidth="254.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+         <graphic>
+            <ImageView fx:id="managerBtn" fitHeight="173.0" fitWidth="214.0" onDragDetected="#manager" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/image-3.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button mnemonicParsing="false" onAction="#setting" prefHeight="54.0" prefWidth="60.0" style="-fx-background-color: transparent;" GridPane.columnIndex="4">
+         <graphic>
+            <ImageView fitHeight="45.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/config-icon-65.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#browsing" prefHeight="374.0" prefWidth="254.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <graphic>
+            <ImageView fitHeight="167.0" fitWidth="167.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/img.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#taskManager" prefHeight="374.0" prefWidth="254.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+         <graphic>
+            <ImageView fitHeight="165.0" fitWidth="165.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/calendar_clock.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+   </children>
+</GridPane>
