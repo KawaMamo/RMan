@@ -3,12 +3,10 @@ import javafx.scene.image.ImageView;
 public class UploadedImages {
     private ImageView imageView;
     private String imageName;
-    private String pah;
 
-    public UploadedImages(ImageView imageView, String imageName, String pah) {
+    public UploadedImages(ImageView imageView, String imageName) {
         this.imageView = imageView;
         this.imageName = imageName;
-        this.pah = pah;
     }
 
 
@@ -31,11 +29,4 @@ public class UploadedImages {
         this.imageName = imageName;
     }
 
-    public String getPah() {
-        return pah;
-    }
-
-    public void setPah(String pah) {
-        this.pah = pah;
-    }
 }

@@ -16,6 +16,12 @@ public class HttpPost {
     private String boundary;
     private final int bufferSize = 4096;
 
+    private String newName;
+
+    public void setNewName(String newName){
+        this.newName = newName;
+    }
+
     public HttpPost(URL argUrl) {
         url = argUrl;
         boundary = "---------------------------4664151417711";
@@ -27,7 +33,6 @@ public class HttpPost {
 
     public void post() {
         try {
-            //System.out.println("url:" + url);
             urlConnection = url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
@@ -45,7 +50,7 @@ public class HttpPost {
             part1 += "--" + boundary + crlf;
             File f = new File(fileNames[0]);
             fileName = f.getName(); // we do not want the whole path, just the name
-            part1 += "Content-Disposition: form-data; name=\"userfile\"; filename=\"" + fileName + "\""
+            part1 += "Content-Disposition: form-data; name=\"userfile\"; filename=\"" + newName + "\""
                     + crlf;
 
             // CONTENT-TYPE
@@ -57,7 +62,6 @@ public class HttpPost {
             }
 
             part1 += crlf;
-            //System.out.println(part1);
             // File's binary data will be sent after this part
 
             // ::::: PART 2 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +69,6 @@ public class HttpPost {
 
 
 
-            //System.out.println("Content-Length"+String.valueOf(part1.length() + part2.length() + fileData.length));
             urlConnection.setRequestProperty("Content-Length",
                     String.valueOf(part1.length() + part2.length() + fileData.length));
 
@@ -77,16 +80,13 @@ public class HttpPost {
             int index = 0;
             int size = bufferSize;
             do {
-                //System.out.println("wrote " + index + "b");
                 if ((index + size) > fileData.length) {
                     size = fileData.length - index;
                 }
                 outputStream.write(fileData, index, size);
                 index += size;
             } while (index < fileData.length);
-            //System.out.println("wrote " + index + "b");
 
-            //System.out.println(part2);
             outputStream.write(part2.getBytes());
             outputStream.flush();
 
@@ -105,13 +105,10 @@ public class HttpPost {
                 }
             } while (len > 0);
             output = sb.toString();
-            System.out.println("sb"+sb.toString());
             //output = "Done";
-            //System.out.println("DONE");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            //System.out.println("Close connection");
             try {
                 outputStream.close();
             } catch (Exception e) {

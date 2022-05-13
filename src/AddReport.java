@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.ResultSet;
+import java.util.List;
 
 
 public class AddReport {
@@ -230,29 +231,32 @@ public class AddReport {
 
     @FXML
     private void chooseImage() throws MalformedURLException {
-
+        // file chooser with specific extensions
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter(".jpg .PNG Files Only", "*.png", "*.jpg")
         );
-        File file = fileChooser.showOpenDialog(Main.stagePointer);
-        ImageView imageView = new ImageView();
-        String path = file.getParent();
+        List<File> fileArray = fileChooser.showOpenMultipleDialog(Main.stagePointer);
 
-        String fileName = System.currentTimeMillis()+".png";
-        File tempFile = new File(path+"\\"+fileName);
-        file.renameTo(tempFile);
-        imageView.setImage(new Image(tempFile.toURI().toURL().toExternalForm()));
+        for(File file : fileArray){
+            // add imageView to observable list
+            ImageView imageView = new ImageView();
+            imageView.setImage(new Image(file.toURI().toURL().toExternalForm()));
+            uploadedImages.add(new UploadedImages(imageView, file.getName()));
 
-        uploadedImages.add(new UploadedImages(imageView, file.getName(), path));
+            String newFileName = System.currentTimeMillis()+".png";
+            sendFileToServer(file.getAbsolutePath(), newFileName);
+        }
+
     }
 
-    private int sendFileToServer(String url){
+    private int sendFileToServer(String url, String newName){
         int isDone = 0;
         try {
 
             HttpPost httpPost = new HttpPost(new URL(config.getProp().getProperty("url")));
             httpPost.setFileNames(new String[]{ url });
+            httpPost.setNewName(newName);
             httpPost.post();
             String output = httpPost.getOutput();
             if(output.equals("Done")){
