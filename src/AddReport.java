@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -188,7 +189,7 @@ public class AddReport {
         submitBtn.setText("please wait");
         int id = 0;
         try {
-            id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText());
+            id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
         } catch (Exception e) {
             e.printStackTrace();
             Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
@@ -209,6 +210,15 @@ public class AddReport {
             } catch (Exception e) {
                 e.printStackTrace();
                 Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+            }
+        }
+
+        for (UploadedImages object : uploadedImages){
+            try {
+                check = connect.addImage(id, object.getImageName(), object.getNewName());
+            } catch (SQLException e) {
+                e.printStackTrace();
+                Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
             }
         }
 
@@ -242,9 +252,11 @@ public class AddReport {
             // add imageView to observable list
             ImageView imageView = new ImageView();
             imageView.setImage(new Image(file.toURI().toURL().toExternalForm()));
-            uploadedImages.add(new UploadedImages(imageView, file.getName()));
 
             String newFileName = System.currentTimeMillis()+".png";
+
+            uploadedImages.add(new UploadedImages(imageView, file.getName(), newFileName));
+
             sendFileToServer(file.getAbsolutePath(), newFileName);
         }
 

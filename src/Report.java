@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.List;
 
 public class Report {
 
@@ -10,15 +11,33 @@ public class Report {
     private LocalDate createdAt;
     private Suggestion[] suggestions;
     private Project[] projects;
+    private List<UploadedImages> uploadedImagesList;
+    private String title;
 
-    public Report(int id, LocalDate reportDate, CategoryClass category, SubCat subCat, String reportText, LocalDate createdAt) {
+    public Report(int id, LocalDate reportDate, CategoryClass category, SubCat subCat, String reportText, LocalDate createdAt, String title) {
         this.id = id;
         this.reportDate = reportDate;
         this.category = category;
         this.subCat = subCat;
         this.reportText = reportText;
         this.createdAt = createdAt;
+        this.title = title;
+    }
 
+    public List<UploadedImages> getUploadedImagesList() {
+        return uploadedImagesList;
+    }
+
+    public void setUploadedImagesList(List<UploadedImages> uploadedImagesList) {
+        this.uploadedImagesList = uploadedImagesList;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Suggestion[] getSuggestions() {

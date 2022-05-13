@@ -92,7 +92,8 @@ public class Filtering {
             CategoryClass categoryClass = new CategoryClass(reports.getString("categoryName"), reports.getInt("catId"));
             Report report = new Report(reports.getInt("id"), LocalDate.parse(reports.getString("reportDate")),
                     categoryClass, new SubCat(reports.getInt("subCatId"), reports.getString("subCatName"),
-                    categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")));
+                    categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")),
+                    reports.getString("title"));
             reportsList.add(report);
             try {
                 ResultSet suggestionSet = connect.getSuggestion(report.getId());
@@ -189,7 +190,7 @@ public class Filtering {
                 if (b || report == null || report.getCategory() == null) {
                     setText(null);
                 } else {
-                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getReportDate());
+                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle());
                 }
             }
         });

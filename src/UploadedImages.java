@@ -3,10 +3,20 @@ import javafx.scene.image.ImageView;
 public class UploadedImages {
     private ImageView imageView;
     private String imageName;
+    private String newName;
 
-    public UploadedImages(ImageView imageView, String imageName) {
+    public String getNewName() {
+        return newName;
+    }
+
+    public void setNewName(String newName) {
+        this.newName = newName;
+    }
+
+    public UploadedImages(ImageView imageView, String imageName, String newName) {
         this.imageView = imageView;
         this.imageName = imageName;
+        this.newName = newName;
     }
 
 

@@ -16,7 +16,7 @@ public class HelloController {
     @FXML
     void dataEntry() throws IOException {
 
-        Main.changeScene("addReport.fxml");
+        Main.changeScene("altAddReport.fxml");
     }
 
     @FXML

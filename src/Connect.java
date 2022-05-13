@@ -110,17 +110,18 @@ public class Connect {
         return insertedId;
     }
 
-    public int addReport(LocalDate reportDate, int catId, int subCatId, String reportText) throws Exception{
+    public int addReport(LocalDate reportDate, int catId, int subCatId, String reportText, String title) throws Exception{
 
         int insertedId = 0;
         try {
             preparedStatement = connect
-                    .prepareStatement("insert into report values (default, ?, ?, ?, ?, default)", statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement("insert into report values (default, ?, ?, ?, ?, default, ?)", statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, reportDate.toString());
             preparedStatement.setInt(2, catId);
             preparedStatement.setInt(3, subCatId);
             preparedStatement.setString(4, reportText);
+            preparedStatement.setString(5, title);
             int rowAffected = preparedStatement.executeUpdate();
             ResultSet rs = null;
             if(rowAffected == 1)
@@ -332,5 +333,31 @@ public class Connect {
         resultSet = preparedStatement.executeQuery();
 
         return resultSet;
+    }
+
+    public int addImage(int reportId, String imageName, String newName) throws SQLException {
+        int insertedId = 0;
+        try {
+            preparedStatement = connect
+                    .prepareStatement("insert into uploadedimages values (default, ?, ?, ?, default)", statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setInt(1, reportId);
+            preparedStatement.setString(2, imageName);
+            preparedStatement.setString(3, newName);
+            int rowAffected = preparedStatement.executeUpdate();
+            ResultSet rs = null;
+            if(rowAffected == 1)
+            {
+                rs = preparedStatement.getGeneratedKeys();
+                if(rs.next())
+                    insertedId = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+
+        }
+
+        return insertedId;
     }
 }
