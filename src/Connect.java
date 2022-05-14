@@ -197,7 +197,7 @@ public class Connect {
         String query = "SELECT * FROM categories";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         resultSet = preparedStatement.executeQuery();
-
+        System.out.println();
         return resultSet;
 
     }
@@ -249,25 +249,37 @@ public class Connect {
 
     }
 
-    public int deleteCat(int[] id) throws SQLException {
-        int rowAffected = 0;
+    public int deleteCat(int[] id) {
+        int rowAffected = -1;
         for(int idNumber: id){
             String query = "DELETE FROM categories WHERE id = ? ";
-            PreparedStatement preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, idNumber);
-            rowAffected = preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement = null;
+            try {
+                preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setInt(1, idNumber);
+                rowAffected = preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
 
         return rowAffected;
     }
 
-    public int deleteSubCat(int[] id) throws SQLException {
-        int rowAffected = 0;
+    public int deleteSubCat(int[] id) {
+        int rowAffected = -1;
         for(int idNumber: id){
             String query = "DELETE FROM subcat WHERE id = ? ";
-            PreparedStatement preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, idNumber);
-            rowAffected = preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement = null;
+            try {
+                preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setInt(1, idNumber);
+                rowAffected = preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
         }
 
         return rowAffected;

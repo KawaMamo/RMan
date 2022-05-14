@@ -64,7 +64,12 @@
                   </HTMLEditor>
                   <VBox alignment="CENTER" spacing="5.0" GridPane.columnIndex="2">
                      <children>
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseImage" text="Choose Image" />
+                        <HBox spacing="3.0">
+                           <children>
+                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseImage" text="Choose Image" />
+                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#deleteImage" text="Delete" />
+                           </children>
+                        </HBox>
                         <ListView fx:id="listOfImages" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" />
                      </children>
                   </VBox>

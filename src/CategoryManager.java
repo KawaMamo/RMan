@@ -104,6 +104,7 @@ public class CategoryManager {
 
         ResultSet cats = connect.getCatList();
         while (cats.next()){
+            System.out.println("cats.getString(categoryName)"+cats.getString("categoryName"));
             categoryObservable.add(new CategoryClass(cats.getString("categoryName"), cats.getInt("id")));
         }
     }
@@ -119,8 +120,14 @@ public class CategoryManager {
     @FXML
     void addSub() throws Exception {
         String subCatName = subCatTF.getText();
-        int subCatId = connect.addSubCat(subCatName, selectedId);
-        subCatObservableList.add(new SubCat(subCatId, subCatName, catList.getSelectionModel().getSelectedItem()));
+        if(catList.getSelectionModel().getSelectedItem() != null){
+            int subCatId = connect.addSubCat(subCatName, selectedId);
+            subCatObservableList.add(new SubCat(subCatId, subCatName, catList.getSelectionModel().getSelectedItem()));
+        }else {
+            Notifications error = Notifications.create().title("Error").text("Select Category first").hideAfter(Duration.hours(1)).position(Pos.BASELINE_LEFT);
+            error.showError();
+        }
+
     }
 
     @FXML
@@ -146,6 +153,12 @@ public class CategoryManager {
         }
         subCatObservableList.removeAll(selectedItems);
         connect.deleteSubCat(ids);
+        try {
+            subCatObservableList.clear();
+            loadSubCatList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -170,7 +183,7 @@ public class CategoryManager {
     }
 
     @FXML
-    void delete() throws Exception {
+    void delete() {
 
         List<CategoryClass> selectedItems = catList.getSelectionModel().getSelectedItems();
         int[] ids = new int[selectedItems.size()];
@@ -180,9 +193,24 @@ public class CategoryManager {
             i++;
         }
         categoryObservable.removeAll(selectedItems);
-        connect.deleteCat(ids);
-        subCatObservableList.clear();
-        loadSubCatList();
+        try {
+            connect.deleteCat(ids);
+        }catch (Exception e){
+            Notifications.create().title("deletion error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
+        }
+
+
+        try {
+            subCatObservableList.clear();
+            loadSubCatList();
+            categoryObservable.clear();
+            loadCatList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
 
     }
 

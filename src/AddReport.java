@@ -265,7 +265,6 @@ public class AddReport {
     private int sendFileToServer(String url, String newName){
         int isDone = 0;
         try {
-
             HttpPost httpPost = new HttpPost(new URL(config.getProp().getProperty("url")));
             httpPost.setFileNames(new String[]{ url });
             httpPost.setNewName(newName);
@@ -279,5 +278,10 @@ public class AddReport {
         }
 
         return  isDone;
+    }
+
+    @FXML
+    private void deleteImage(){
+        uploadedImages.remove(listOfImages.getSelectionModel().getSelectedItem());
     }
 }
