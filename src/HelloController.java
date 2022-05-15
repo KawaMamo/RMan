@@ -36,7 +36,7 @@ public class HelloController {
 
     @FXML
     private void browsing() throws IOException {
-        Main.changeScene("");
+        Main.changeScene("catGridView.fxml");
     }
 
     @FXML

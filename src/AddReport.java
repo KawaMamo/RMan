@@ -264,17 +264,19 @@ public class AddReport {
 
     private int sendFileToServer(String url, String newName){
         int isDone = 0;
+        HttpPost httpPost = null;
         try {
-            HttpPost httpPost = new HttpPost(new URL(config.getProp().getProperty("url")));
-            httpPost.setFileNames(new String[]{ url });
-            httpPost.setNewName(newName);
-            httpPost.post();
-            String output = httpPost.getOutput();
-            if(output.equals("Done")){
-                isDone = 1;
-            }
-        }catch (Exception e){
-
+            httpPost = new HttpPost(new URL(config.getProp().getProperty("url")));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Notifications.create().text(e.getMessage()).show();
+        }
+        httpPost.setFileNames(new String[]{ url });
+        httpPost.setNewName(newName);
+        httpPost.post();
+        String output = httpPost.getOutput();
+        if(output.equals("Done")){
+            isDone = 1;
         }
 
         return  isDone;

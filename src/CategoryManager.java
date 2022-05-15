@@ -104,7 +104,6 @@ public class CategoryManager {
 
         ResultSet cats = connect.getCatList();
         while (cats.next()){
-            System.out.println("cats.getString(categoryName)"+cats.getString("categoryName"));
             categoryObservable.add(new CategoryClass(cats.getString("categoryName"), cats.getInt("id")));
         }
     }

@@ -202,6 +202,19 @@ public class Connect {
 
     }
 
+    public int getCatCount() throws Exception {
+        ResultSet resultSet = null;
+        int counter = 0;
+        String query = "SELECT COUNT(id) AS counter FROM categories";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            counter = resultSet.getInt("counter");
+        }
+        return counter;
+
+    }
+
     public ResultSet getSubCats() throws Exception {
         ResultSet resultSet = null;
 

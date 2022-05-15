@@ -1,4 +1,5 @@
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
@@ -13,9 +14,19 @@ public class CatGridView {
     private void initialize(){
         try {
             Connect connect = new Connect();
+            int catCount = connect.getCatCount();
+            int numberOfRows = (int)Math.ceil(Math.sqrt(catCount));
             ResultSet cats = connect.getCatList();
-            int catCount = cats.getInt("counter");
+            int i = 0;
 
+            while (cats.next()){
+                if(i<numberOfRows){
+                    for (int j = 0; j<numberOfRows; j++){
+                        gridPane.add(new Label(cats.getString("categoryName")), i, j);
+                    }
+                }
+                i++;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
