@@ -197,7 +197,6 @@ public class Connect {
         String query = "SELECT * FROM categories";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         resultSet = preparedStatement.executeQuery();
-        System.out.println();
         return resultSet;
 
     }
