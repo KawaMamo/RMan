@@ -214,6 +214,20 @@ public class Connect {
 
     }
 
+    public int getSubCatCount(int catId) throws Exception {
+        ResultSet resultSet = null;
+        int counter = 0;
+        String query = "SELECT COUNT(id) AS counter FROM subCat WHERE catId = ? ";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        preparedStatement.setInt(1, catId);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            counter = resultSet.getInt("counter");
+        }
+        return counter;
+
+    }
+
     public ResultSet getSubCats() throws Exception {
         ResultSet resultSet = null;
 
@@ -224,6 +238,7 @@ public class Connect {
         return resultSet;
 
     }
+
 
     public ResultSet getSubCats(int catId) throws Exception {
         ResultSet resultSet = null;

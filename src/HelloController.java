@@ -41,7 +41,7 @@ public class HelloController {
 
     @FXML
     private void taskManager() throws IOException {
-        Main.changeScene("");
+        Main.changeScene("taskDashBoard.fxml");
     }
 
 }

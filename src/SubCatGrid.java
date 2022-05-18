@@ -13,34 +13,34 @@ import org.controlsfx.control.Notifications;
 import java.io.IOException;
 import java.sql.ResultSet;
 
-public class CatGridView {
+public class SubCatGrid {
 
     @FXML
     private GridPane gridPane;
-    public static int catId;
+
+    public static int subCatId;
     @FXML
     private void initialize(){
         try {
 
             Connect connect = new Connect();
-            int catCount = connect.getCatCount();
-            int numberOfRows = (int)Math.ceil(Math.sqrt(catCount));
-            ResultSet cats = connect.getCatList();
+            int subCatCount = connect.getSubCatCount(CatGridView.catId);
+            int numberOfRows = (int)Math.ceil(Math.sqrt(subCatCount));
+            ResultSet subCats = connect.getSubCats(CatGridView.catId);
             int i = 0;
             int j = 0;
-            while (cats.next()){
-                String categoryName = cats.getString("categoryName");
-                int id = cats.getInt("id");
-                Button button = new Button(categoryName);
+            while (subCats.next()){
+                String subCategoryName = subCats.getString("subCatName");
+                int id = subCats.getInt("id");
+                Button button = new Button(subCategoryName);
                 button.setMaxWidth(Double.MAX_VALUE);
                 button.setMaxHeight(Double.MAX_VALUE);
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        catId = id;
                         try {
-                            System.out.println("subCatGrid");
-                            Main.changeScene("subCatGrid.fxml");
+                            subCatId = id;
+                            Main.changeScene("ReportsDetails.fxml");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -84,6 +84,6 @@ public class CatGridView {
 
     @FXML
     private void goHome() throws IOException {
-        Main.changeScene("hello-view.fxml");
+        Main.changeScene("catGridView.fxml");
     }
 }

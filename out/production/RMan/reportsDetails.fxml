@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="1116.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ReportsDetails">
+   <children>
+      <TextField fx:id="searchTF" nodeOrientation="RIGHT_TO_LEFT" promptText="write what you are looking for" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <ListView fx:id="searchListView" nodeOrientation="RIGHT_TO_LEFT" prefHeight="514.0" prefWidth="502.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+      <GridPane nodeOrientation="RIGHT_TO_LEFT" style="-fx-border-width: 0.5; -fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <children>
+            <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="suggestionsList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
+            <ListView fx:id="projectsList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
+            <Label text="suggestions" GridPane.rowIndex="1" />
+            <Label text="Projects" GridPane.rowIndex="3" />
+         </children>
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <rowConstraints>
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="28.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="130.0" minHeight="10.0" prefHeight="130.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="28.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="130.0" minHeight="10.0" prefHeight="130.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <Label text="Search in Reports" GridPane.columnIndex="3" />
+      <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <children>
+            <Button mnemonicParsing="false" onAction="#reset" prefHeight="31.0" prefWidth="72.0" text="Reset" />
+            <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#search" prefHeight="31.0" prefWidth="165.0" text="Search" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <DatePicker fx:id="reportDate" />
+         </children>
+      </HBox>
+      <Button mnemonicParsing="false" onAction="#goHome" prefHeight="38.0" prefWidth="48.0" GridPane.columnIndex="1">
+         <graphic>
+            <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/home-icon2.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+   </children>
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="0.0" prefWidth="20.0" />
+      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="728.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="32.0" minWidth="10.0" prefWidth="32.0" />
+      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="315.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="6.0" prefWidth="20.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="76.0" minHeight="10.0" prefHeight="76.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="512.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+</GridPane>
