@@ -79,7 +79,7 @@ public class TaskDashBoard {
 
     public static void setList(int day){
         observableList.clear();
-        observableList.add(new Duty("hjhbjh", false));
+        observableList.add(new Duty("this duty", 1));
     }
 
     private void setCalender(int year, int month){

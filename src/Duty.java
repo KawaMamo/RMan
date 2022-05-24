@@ -3,7 +3,7 @@ import java.time.LocalDate;
 public class Duty {
 
     private String description;
-    private boolean isDone;
+    private int id;
 
     public String getDescription() {
         return description;
@@ -13,21 +13,21 @@ public class Duty {
         this.description = description;
     }
 
-    public boolean isDone() {
-        return isDone;
+    public int getId() {
+        return id;
     }
 
-    public void setDone(boolean done) {
-        isDone = done;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public Duty(String description, boolean isDone) {
+    public Duty(String description, int id) {
         this.description = description;
-        this.isDone = isDone;
+        this.id = id;
     }
 
     @Override
     public String toString(){
-        return description +" :: "+isDone;
+        return description;
     }
 }
