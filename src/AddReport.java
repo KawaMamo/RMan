@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -159,6 +160,8 @@ public class AddReport {
                 }
             }
         });
+
+        dateTF.setValue(LocalDate.now());
 
     }
 

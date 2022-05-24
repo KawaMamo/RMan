@@ -3,6 +3,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -19,6 +20,7 @@ public class SubCatGrid {
     private GridPane gridPane;
 
     public static int subCatId;
+
     @FXML
     private void initialize(){
         try {
@@ -33,6 +35,8 @@ public class SubCatGrid {
                 String subCategoryName = subCats.getString("subCatName");
                 int id = subCats.getInt("id");
                 Button button = new Button(subCategoryName);
+                System.out.println(((140/numberOfRows)-subCategoryName.length())+" - "+subCategoryName.length());
+                button.setStyle("-fx-font-size:"+((140/numberOfRows)-subCategoryName.length())+"pt;-fx-wrap-text : true;");
                 button.setMaxWidth(Double.MAX_VALUE);
                 button.setMaxHeight(Double.MAX_VALUE);
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -40,7 +44,7 @@ public class SubCatGrid {
                     public void handle(MouseEvent event) {
                         try {
                             subCatId = id;
-                            Main.changeScene("ReportsDetails.fxml");
+                            Main.changeScene("reportsDetails.fxml");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -79,6 +83,8 @@ public class SubCatGrid {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
 
     }
 
