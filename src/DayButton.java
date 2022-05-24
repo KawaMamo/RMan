@@ -11,9 +11,11 @@ public class DayButton extends Button {
 
     DayButton(String name){
         super(name);
+        setOpacity(0.4);
         setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY){
                 TaskDashBoard.setList(Integer.valueOf(name));
+                setOpacity(1.0);
             }else if(mouseEvent.getButton() == MouseButton.SECONDARY){
                 Stage stage = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addDuty.fxml"));
@@ -26,9 +28,6 @@ public class DayButton extends Button {
                     e.printStackTrace();
                 }
             }
-
-
-
         });
     }
 }
