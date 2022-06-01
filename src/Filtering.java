@@ -1,21 +1,29 @@
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Filtering {
 
@@ -48,7 +56,15 @@ public class Filtering {
     @FXML
     private TextField searchTF;
 
+    @FXML
+    private ListView<UploadedImages> listOfImages;
+
+    ObservableList<UploadedImages> uploadedImagesToShow = FXCollections.observableArrayList();
+
+    String urlToImages;
+
     Connect connect;
+    Config config;
 
     ObservableList<Suggestion> suggestionObservableList = FXCollections.observableArrayList();
     ObservableList<Project> projectObservableList = FXCollections.observableArrayList();
@@ -59,7 +75,6 @@ public class Filtering {
         Map<String, String> whereClauseArgs = new HashMap<>();
 
         if(searchTF.getText() != null){
-            System.out.println("searchTF.getText() "+searchTF.getText());
             whereClauseArgs.put("reportText", searchTF.getText());
         }
 
@@ -134,13 +149,27 @@ public class Filtering {
                     projects[c] = project;
                     c++;
                 }
-
                 report.setProjects(projects);
 
             } catch (Exception e) {
                 e.printStackTrace();
                 Notifications error = Notifications.create().text(e.getMessage()).title("Loading Projects Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
                 error.showError();
+            }
+
+            try {
+                ObservableList<UploadedImages> uploadedImages = FXCollections.observableArrayList();
+                ResultSet images = connect.getImages(report.getId());
+                while (images.next()){
+                    // add imageView to observable list
+                    ImageView imageView = new ImageView();
+                    imageView.setImage(new Image(urlToImages+images.getString("imageNewName")));
+                    uploadedImages.add(new UploadedImages(imageView, images.getString("imageName"), images.getString("imageNewName")));
+
+                }
+                report.setUploadedImagesList(uploadedImages);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -150,6 +179,8 @@ public class Filtering {
     private void initialize(){
         try {
             connect = new Connect();
+            config  = new Config();
+            urlToImages = config.getProp().getProperty("imageUrl");
         } catch (IOException e) {
             e.printStackTrace();
             Notifications error = Notifications.create().text(e.getMessage()).title("unable to connect").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
@@ -207,6 +238,10 @@ public class Filtering {
                 projectObservableList.clear();
                 projectObservableList.addAll(t1.getProjects());
                 projectsList.setItems(projectObservableList);
+
+                uploadedImagesToShow.clear();
+                uploadedImagesToShow.addAll(t1.getUploadedImagesList());
+                listOfImages.setItems(uploadedImagesToShow);
             }
         });
 
@@ -234,6 +269,41 @@ public class Filtering {
             }
         });
 
+        webView.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if(event.getDeltaY()>0 && event.isControlDown()){
+                    webView.setZoom(1.1*webView.getZoom());
+                }else if(event.getDeltaY()<0 && event.isControlDown()){
+                    webView.setZoom(webView.getZoom()/1.1);
+                }
+
+            }
+        });
+
+        webView.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
+            @Override public void onChanged(Change<? extends Node> change) {
+                Set<Node> deadSeaScrolls = webView.lookupAll(".scroll-bar");
+                for (Node scroll : deadSeaScrolls) {
+                    scroll.setVisible(false);
+                }
+            }
+        });
+
+        listOfImages.setCellFactory(param -> new ListCell<UploadedImages>(){
+            @Override
+            public void updateItem(UploadedImages uploadedImages, boolean empty) {
+                super.updateItem(uploadedImages, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(uploadedImages.getImageName());
+                    setGraphic(uploadedImages.getImageView());
+                }
+            }
+        });
+
     }
 
     @FXML
@@ -247,6 +317,11 @@ public class Filtering {
         catCB.setValue(null);
         subCatCB.setValue(null);
         searchTF.setText(null);
+
+    }
+
+    @FXML
+    private void preview(){
 
     }
 

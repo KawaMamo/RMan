@@ -264,6 +264,18 @@ public class Connect {
 
     }
 
+    public ResultSet getImages(int reportId) throws Exception {
+        ResultSet resultSet = null;
+
+        String query = "SELECT * FROM uploadedimages u WHERE reportId = ? ";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        preparedStatement.setInt(1, reportId);
+        resultSet = preparedStatement.executeQuery();
+
+        return resultSet;
+
+    }
+
     public ResultSet getProjects(int reportId) throws Exception {
         ResultSet resultSet = null;
 
@@ -357,7 +369,7 @@ public class Connect {
 
         String query = "SELECT * FROM report r" +
                 " LEFT JOIN categories c ON c.id = r.catId " +
-                " LEFT JOIN subcat s ON s.id = r.subCatId"+where;
+                " LEFT JOIN subcat s ON s.id = r.subCatId"+where+" ORDER BY r.id DESC";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         int i = 1;
         for (Map.Entry<String, String> entry: whereClause.entrySet()){

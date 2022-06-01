@@ -20,6 +20,7 @@ public class UploadedImages {
     }
 
 
+
     public ImageView getImageView() {
 
         imageView.setPreserveRatio(true);
