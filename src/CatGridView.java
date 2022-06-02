@@ -32,6 +32,7 @@ public class CatGridView {
                 String categoryName = cats.getString("categoryName");
                 int id = cats.getInt("id");
                 Button button = new Button(categoryName);
+                button.setStyle("-fx-font-size:"+((120/numberOfRows)-categoryName.length()*0.8)+"pt;-fx-wrap-text : true;");
                 button.setMaxWidth(Double.MAX_VALUE);
                 button.setMaxHeight(Double.MAX_VALUE);
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {

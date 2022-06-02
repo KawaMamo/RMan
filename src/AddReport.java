@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebEngine;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
@@ -19,6 +20,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -65,6 +67,9 @@ public class AddReport {
 
     Config config;
 
+    public static int editId = 0;
+
+
 
     @FXML
     void addSuggestion() {
@@ -83,10 +88,12 @@ public class AddReport {
     @FXML
     private void goHome() throws IOException {
         Main.changeScene("hello-view.fxml");
+        reset();
     }
 
     @FXML
     private void initialize(){
+
 
         try {
             connect = new Connect();
@@ -109,11 +116,14 @@ public class AddReport {
             @Override
             public void changed(ObservableValue<? extends CategoryClass> observableValue, CategoryClass categoryClass, CategoryClass t1) {
                 try {
-                    subCatCB.getItems().clear();
-                    ResultSet subCats = connect.getSubCats(t1.getCatId());
-                    while (subCats.next()){
-                        subCatCB.getItems().add(new SubCat(subCats.getInt("id"), subCats.getString("subCatName"), new CategoryClass(t1.getCatName(), t1.getCatId())));
+                    if(t1 != null){
+                        subCatCB.getItems().clear();
+                        ResultSet subCats = connect.getSubCats(t1.getCatId());
+                        while (subCats.next()){
+                            subCatCB.getItems().add(new SubCat(subCats.getInt("id"), subCats.getString("subCatName"), new CategoryClass(t1.getCatName(), t1.getCatId())));
+                        }
                     }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -163,6 +173,89 @@ public class AddReport {
 
         dateTF.setValue(LocalDate.now());
 
+        // check if the page opened to edit report
+        if(editId != 0){
+            loadReport(editId);
+        }else {
+
+        }
+    }
+
+    private void loadReport(int editId) {
+        try {
+            Report report = null;
+            ResultSet reportData = connect.getReport(editId);
+            while (reportData.next()){
+                CategoryClass categoryObject = new CategoryClass(reportData.getString("categoryName"), reportData.getInt("catId"));
+                SubCat subCat = new SubCat(reportData.getInt("subCatId"), reportData.getString("subCatName"), categoryObject);
+                report = new Report(editId, LocalDate.parse(reportData.getString("reportDate")), categoryObject, subCat
+                        , reportData.getString("reportText"), LocalDate.parse(reportData.getString("createdAt")),
+                        reportData.getString("title"));
+            }
+            ResultSet suggestionSet = connect.getSuggestion(editId);
+            List<Suggestion> suggestionArray = new ArrayList<>();
+            while (suggestionSet.next()){
+                suggestionArray.add(new Suggestion(editId, report, suggestionSet.getString("suggestionText"),
+                        LocalDate.parse(suggestionSet.getString("createdAt"))));
+                suggestions.add(suggestionSet.getString("suggestionText"));
+            }
+            Suggestion[] suggestionsArray = new Suggestion[suggestionArray.size()];
+            int c = 0;
+            for (Suggestion suggestion: suggestionArray){
+                suggestionsArray[c] = suggestion;
+                c++;
+            }
+            report.setSuggestions(suggestionsArray);
+
+            List<Project> tempProject = new ArrayList<>();
+            ResultSet projectSet = connect.getProjects(report.getId());
+            while (projectSet.next()){
+                tempProject.add(new Project(projectSet.getInt("id"), report,
+                        projectSet.getString("projectsText"),
+                        LocalDate.parse(projectSet.getString("createdAt"))));
+                projects.add(projectSet.getString("projectsText"));
+            }
+
+            Project[] projectsArray = new Project[tempProject.size()];
+            int k = 0;
+            for (Project project: tempProject){
+                projectsArray[k] = project;
+                k++;
+            }
+            report.setProjects(projectsArray);
+
+            htmlEditor.setHtmlText(report.getReportText());
+            submitBtn.setText("update");
+            categoryCB.getItems().add(report.getCategory());
+            categoryCB.setValue(report.getCategory());
+            subCatCB.getItems().add(report.getSubCat());
+            subCatCB.setValue(report.getSubCat());
+            dateTF.setValue(report.getReportDate());
+            titleTF.setText(report.getTitle());
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Notifications.create().title("unable to load report data").text(e.getMessage()).showError();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications.create().title("unable to load suggestions data").text(e.getMessage()).showError();
+        }
+
+
+    }
+
+    private void reset(){
+        editId = 0;
+        htmlEditor.setHtmlText("");
+        submitBtn.setText("Submit");
+        dateTF.setValue(LocalDate.now());
+        projects.clear();
+        suggestions.clear();
+        titleTF.setText(null);
+        categoryCB.getItems().add(null);categoryCB.setValue(null);
+        subCatCB.getItems().add(null);subCatCB.setValue(null);
+        uploadedImages.clear();
     }
 
     @FXML
@@ -187,53 +280,111 @@ public class AddReport {
 
     @FXML
     private void submit() {
+        // check if we are going to add or edit
+        if(editId ==0){
 
-        submitBtn.setDisable(true);
-        submitBtn.setText("please wait");
-        int id = 0;
-        try {
-            id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
-        }
-        int check = 0;
-        for (String object: suggestions){
+            submitBtn.setDisable(true);
+            submitBtn.setText("please wait");
+            int id = 0;
             try {
-                connect.addSuggestion(id, object);
+                id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
             } catch (Exception e) {
                 e.printStackTrace();
                 Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
             }
-        }
-
-        for (String object: projects){
-            try {
-                check = connect.addProject(id, object);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+            int check = 0;
+            for (String object: suggestions){
+                try {
+                    connect.addSuggestion(id, object);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                }
             }
-        }
 
-        for (UploadedImages object : uploadedImages){
-            try {
-                check = connect.addImage(id, object.getImageName(), object.getNewName());
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
+            for (String object: projects){
+                try {
+                    check = connect.addProject(id, object);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                }
             }
-        }
 
-        submitBtn.setDisable(false);
+            for (UploadedImages object : uploadedImages){
+                try {
+                    check = connect.addImage(id, object.getImageName(), object.getNewName());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
+                }
+            }
 
-        if(id != 0){
-            Notifications.create().title("Success").text("Report details added successfully").hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showConfirm();
-            submitBtn.setText("Add new");
+            submitBtn.setDisable(false);
+
+            if(id != 0){
+                Notifications.create().title("Success").text("Report details added successfully").hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showConfirm();
+                submitBtn.setText("Add new");
+            }else {
+                Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();
+                submitBtn.setText("Try Again");
+            }
+
         }else {
-            Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();
-            submitBtn.setText("Try Again");
+
+            connect.deleteReport(editId);
+            connect.deleteProjects(editId);
+            connect.deleteSuggestion(editId);
+            connect.deleteUploadedImages(editId);
+
+            submitBtn.setDisable(true);
+            submitBtn.setText("please wait");
+            int id = 0;
+            try {
+                id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+            }
+            int check = 0;
+            for (String object: suggestions){
+                try {
+                    connect.addSuggestion(id, object);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                }
+            }
+
+            for (String object: projects){
+                try {
+                    check = connect.addProject(id, object);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                }
+            }
+
+            for (UploadedImages object : uploadedImages){
+                try {
+                    check = connect.addImage(id, object.getImageName(), object.getNewName());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
+                }
+            }
+
+            submitBtn.setDisable(false);
+
+            if(id != 0){
+                Notifications.create().title("Success").text("Report details added successfully").hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showConfirm();
+                submitBtn.setText("Add new");
+            }else {
+                Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();
+                submitBtn.setText("Try Again");
+            }
         }
+        reset();
 
     }
 

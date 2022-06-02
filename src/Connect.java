@@ -306,6 +306,66 @@ public class Connect {
         return rowAffected;
     }
 
+    public int deleteReport(int id) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM report WHERE id = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
+    public int deleteProjects(int id) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM projects WHERE reportId = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
+    public int deleteSuggestion(int id) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM suggestions WHERE reportId = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
+    public int deleteUploadedImages(int id) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM uploadedimages WHERE reportId = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
     public int deleteSubCat(int[] id) {
         int rowAffected = -1;
         for(int idNumber: id){
@@ -381,6 +441,20 @@ public class Connect {
 
             i++;
         }
+        resultSet = preparedStatement.executeQuery();
+
+        return resultSet;
+    }
+
+    public ResultSet getReport(int id) throws SQLException {
+
+        ResultSet resultSet = null;
+        String query = "SELECT * FROM report r" +
+                " LEFT JOIN categories c ON c.id = r.catId " +
+                " LEFT JOIN subcat s ON s.id = r.subCatId " +
+                " LEFT JOIN uploadedimages u ON r.id =u.reportId WHERE r.id = ? ";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        preparedStatement.setInt(1, id);
         resultSet = preparedStatement.executeQuery();
 
         return resultSet;

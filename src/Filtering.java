@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -242,6 +243,20 @@ public class Filtering {
                 uploadedImagesToShow.clear();
                 uploadedImagesToShow.addAll(t1.getUploadedImagesList());
                 listOfImages.setItems(uploadedImagesToShow);
+            }
+        });
+
+        searchListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount()==2){
+                    AddReport.editId = searchListView.getSelectionModel().getSelectedItems().get(0).getId();
+                    try {
+                        Main.changeScene("addReport.fxml");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 

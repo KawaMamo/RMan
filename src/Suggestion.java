@@ -7,10 +7,10 @@ public class Suggestion {
     private String suggestionText;
     private LocalDate createdAt;
 
-    public Suggestion(int id, Report report, String projectsText, LocalDate createdAt) {
+    public Suggestion(int id, Report report, String suggestionText, LocalDate createdAt) {
         this.id = id;
         this.report = report;
-        this.suggestionText = projectsText;
+        this.suggestionText = suggestionText;
         this.createdAt = createdAt;
     }
 
