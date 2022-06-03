@@ -15,13 +15,18 @@ public class AreYouSure {
             e.printStackTrace();
         }
 
-        Filtering.reportsList.remove(report);
+
         deleteId = report.getId();
         connect.deleteReport(deleteId);
         connect.deleteProjects(deleteId);
         connect.deleteSuggestion(deleteId);
         connect.deleteUploadedImages(deleteId);
         Filtering.modal.close();
+        try {
+            Main.changeScene("Filtering.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

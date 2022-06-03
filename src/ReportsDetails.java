@@ -1,10 +1,17 @@
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
@@ -16,6 +23,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ReportsDetails {
 
@@ -43,14 +51,23 @@ public class ReportsDetails {
     private TextField searchTF;
 
     Connect connect;
+    Config config;
+    String urlToImages;
 
     ObservableList<Suggestion> suggestionObservableList = FXCollections.observableArrayList();
     ObservableList<Project> projectObservableList = FXCollections.observableArrayList();
 
     @FXML
+    private ListView<UploadedImages> listOfImages;
+
+    ObservableList<UploadedImages> uploadedImagesToShow = FXCollections.observableArrayList();
+
+    Map<String, String> whereClauseArgs = new HashMap<>();
+
+    @FXML
     void search() {
 
-        Map<String, String> whereClauseArgs = new HashMap<>();
+        whereClauseArgs.clear();
 
         if(searchTF.getText() != null){
             System.out.println("searchTF.getText() "+searchTF.getText());
@@ -74,6 +91,70 @@ public class ReportsDetails {
 
     }
 
+    private void loadReportData(Report report){
+        try {
+            ResultSet suggestionSet = connect.getSuggestion(report.getId());
+            ObservableList<Suggestion> tempSuggest = FXCollections.observableArrayList();
+
+            while (suggestionSet.next()){
+                tempSuggest.add(new Suggestion(suggestionSet.getInt("id"), report,
+                        suggestionSet.getString("suggestionText"),
+                        LocalDate.parse(suggestionSet.getString("createdAt"))));
+            }
+
+            Suggestion[] suggestions = new Suggestion[tempSuggest.size()];
+            int c = 0;
+            for (Suggestion suggestion: tempSuggest){
+                suggestions[c] = suggestion;
+                c++;
+            }
+
+            report.setSuggestions(suggestions);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications error = Notifications.create().text(e.getMessage()).title("Loading suggestions Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
+            error.showError();
+        }
+
+        try {
+            ObservableList<Project> tempProject = FXCollections.observableArrayList();
+            ResultSet projectSet = connect.getProjects(report.getId());
+            while (projectSet.next()){
+                tempProject.add(new Project(projectSet.getInt("id"), report,
+                        projectSet.getString("projectsText"),
+                        LocalDate.parse(projectSet.getString("createdAt"))));
+            }
+
+            Project[] projects = new Project[tempProject.size()];
+            int c = 0;
+            for (Project project: tempProject){
+                projects[c] = project;
+                c++;
+            }
+            report.setProjects(projects);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications error = Notifications.create().text(e.getMessage()).title("Loading Projects Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
+            error.showError();
+        }
+
+        try {
+            ObservableList<UploadedImages> uploadedImages = FXCollections.observableArrayList();
+            ResultSet images = connect.getImages(report.getId());
+            while (images.next()){
+                // add imageView to observable list
+                ImageView imageView = new ImageView();
+                imageView.setImage(new Image(urlToImages+images.getString("imageNewName")));
+                uploadedImages.add(new UploadedImages(imageView, images.getString("imageName"), images.getString("imageNewName")));
+
+            }
+            report.setUploadedImagesList(uploadedImages);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadReports(Map whereClause) throws SQLException {
         reportsList.clear();
 
@@ -85,53 +166,7 @@ public class ReportsDetails {
                     categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")),
                     reports.getString("title"));
             reportsList.add(report);
-            try {
-                ResultSet suggestionSet = connect.getSuggestion(report.getId());
-                ObservableList<Suggestion> tempSuggest = FXCollections.observableArrayList();
 
-                while (suggestionSet.next()){
-                    tempSuggest.add(new Suggestion(suggestionSet.getInt("id"), report,
-                            suggestionSet.getString("suggestionText"),
-                            LocalDate.parse(suggestionSet.getString("createdAt"))));
-                }
-
-                Suggestion[] suggestions = new Suggestion[tempSuggest.size()];
-                int c = 0;
-                for (Suggestion suggestion: tempSuggest){
-                    suggestions[c] = suggestion;
-                    c++;
-                }
-
-                report.setSuggestions(suggestions);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notifications error = Notifications.create().text(e.getMessage()).title("Loading suggestions Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
-                error.showError();
-            }
-
-            try {
-                ObservableList<Project> tempProject = FXCollections.observableArrayList();
-                ResultSet projectSet = connect.getProjects(report.getId());
-                while (projectSet.next()){
-                    tempProject.add(new Project(projectSet.getInt("id"), report,
-                            projectSet.getString("projectsText"),
-                            LocalDate.parse(projectSet.getString("createdAt"))));
-                }
-
-                Project[] projects = new Project[tempProject.size()];
-                int c = 0;
-                for (Project project: tempProject){
-                    projects[c] = project;
-                    c++;
-                }
-
-                report.setProjects(projects);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notifications error = Notifications.create().text(e.getMessage()).title("Loading Projects Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
-                error.showError();
-            }
         }
 
     }
@@ -140,6 +175,8 @@ public class ReportsDetails {
     private void initialize(){
         try {
             connect = new Connect();
+            config  = new Config();
+            urlToImages = config.getProp().getProperty("imageUrl");
         } catch (IOException e) {
             e.printStackTrace();
             Notifications error = Notifications.create().text(e.getMessage()).title("unable to connect").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
@@ -154,7 +191,12 @@ public class ReportsDetails {
                 if (b || report == null || report.getCategory() == null) {
                     setText(null);
                 } else {
-                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle());
+                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
+                    setFont(Font.font(19));
+                    setMaxWidth(param.getWidth());
+                    setPrefWidth(param.getWidth());
+                    setMinWidth(param.getWidth());
+                    setWrapText(true);
                 }
             }
         });
@@ -162,15 +204,22 @@ public class ReportsDetails {
         searchListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Report>() {
             @Override
             public void changed(ObservableValue<? extends Report> observableValue, Report report, Report t1) {
-                WebEngine webEngine = webView.getEngine();
-                webEngine.loadContent(t1.getReportText(), "text/html");
-                suggestionObservableList.clear();
-                suggestionObservableList.addAll(t1.getSuggestions());
-                suggestionsList.setItems(suggestionObservableList);
+                if(t1 != null){
+                    loadReportData(t1);
+                    WebEngine webEngine = webView.getEngine();
+                    webEngine.loadContent(t1.getReportText(), "text/html");
+                    suggestionObservableList.clear();
+                    suggestionObservableList.addAll(t1.getSuggestions());
+                    suggestionsList.setItems(suggestionObservableList);
 
-                projectObservableList.clear();
-                projectObservableList.addAll(t1.getProjects());
-                projectsList.setItems(projectObservableList);
+                    projectObservableList.clear();
+                    projectObservableList.addAll(t1.getProjects());
+                    projectsList.setItems(projectObservableList);
+
+                    uploadedImagesToShow.clear();
+                    uploadedImagesToShow.addAll(t1.getUploadedImagesList());
+                    listOfImages.setItems(uploadedImagesToShow);
+                }
             }
         });
 
@@ -198,6 +247,48 @@ public class ReportsDetails {
             }
         });
 
+        webView.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if(event.getDeltaY()>0 && event.isControlDown()){
+                    webView.setZoom(1.1*webView.getZoom());
+                }else if(event.getDeltaY()<0 && event.isControlDown()){
+                    webView.setZoom(webView.getZoom()/1.1);
+                }
+
+            }
+        });
+
+        webView.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
+            @Override public void onChanged(Change<? extends Node> change) {
+                Set<Node> deadSeaScrolls = webView.lookupAll(".scroll-bar");
+                for (Node scroll : deadSeaScrolls) {
+                    scroll.setVisible(false);
+                }
+            }
+        });
+
+        listOfImages.setCellFactory(param -> new ListCell<UploadedImages>(){
+            @Override
+            public void updateItem(UploadedImages uploadedImages, boolean empty) {
+                super.updateItem(uploadedImages, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(uploadedImages.getImageName());
+                    setGraphic(uploadedImages.getImageView());
+                }
+            }
+        });
+        whereClauseArgs.put("subCatId", String.valueOf(SubCatGrid.subCatId));
+        try {
+            loadReports(whereClauseArgs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @FXML
@@ -206,9 +297,19 @@ public class ReportsDetails {
     }
 
     @FXML
+    private void goBack() throws IOException {
+        Main.changeScene("subCatGrid.fxml");
+    }
+
+    @FXML
     private void reset(){
         reportDate.setValue(null);
         searchTF.setText(null);
+
+    }
+
+    @FXML
+    private void preview(){
 
     }
 }

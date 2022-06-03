@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -40,7 +41,7 @@ public class Filtering {
     @FXML
     private ListView<Report> searchListView;
 
-    public static ObservableList<Report> reportsList = FXCollections.observableArrayList();
+    private ObservableList<Report> reportsList = FXCollections.observableArrayList();
 
     @FXML
     private WebView webView;
@@ -77,6 +78,7 @@ public class Filtering {
     ObservableList<Project> projectObservableList = FXCollections.observableArrayList();
 
     public static Stage modal;
+    public static Report selectedReport;
 
     @FXML
     void search() {
@@ -108,6 +110,70 @@ public class Filtering {
 
     }
 
+    private void loadReportData(Report report){
+        try {
+            ResultSet suggestionSet = connect.getSuggestion(report.getId());
+            ObservableList<Suggestion> tempSuggest = FXCollections.observableArrayList();
+
+            while (suggestionSet.next()){
+                tempSuggest.add(new Suggestion(suggestionSet.getInt("id"), report,
+                        suggestionSet.getString("suggestionText"),
+                        LocalDate.parse(suggestionSet.getString("createdAt"))));
+            }
+
+            Suggestion[] suggestions = new Suggestion[tempSuggest.size()];
+            int c = 0;
+            for (Suggestion suggestion: tempSuggest){
+                suggestions[c] = suggestion;
+                c++;
+            }
+
+            report.setSuggestions(suggestions);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications error = Notifications.create().text(e.getMessage()).title("Loading suggestions Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
+            error.showError();
+        }
+
+        try {
+            ObservableList<Project> tempProject = FXCollections.observableArrayList();
+            ResultSet projectSet = connect.getProjects(report.getId());
+            while (projectSet.next()){
+                tempProject.add(new Project(projectSet.getInt("id"), report,
+                        projectSet.getString("projectsText"),
+                        LocalDate.parse(projectSet.getString("createdAt"))));
+            }
+
+            Project[] projects = new Project[tempProject.size()];
+            int c = 0;
+            for (Project project: tempProject){
+                projects[c] = project;
+                c++;
+            }
+            report.setProjects(projects);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications error = Notifications.create().text(e.getMessage()).title("Loading Projects Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
+            error.showError();
+        }
+
+        try {
+            ObservableList<UploadedImages> uploadedImages = FXCollections.observableArrayList();
+            ResultSet images = connect.getImages(report.getId());
+            while (images.next()){
+                // add imageView to observable list
+                ImageView imageView = new ImageView();
+                imageView.setImage(new Image(urlToImages+images.getString("imageNewName")));
+                uploadedImages.add(new UploadedImages(imageView, images.getString("imageName"), images.getString("imageNewName")));
+
+            }
+            report.setUploadedImagesList(uploadedImages);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadReports(Map whereClause) throws SQLException {
         reportsList.clear();
 
@@ -119,67 +185,7 @@ public class Filtering {
                     categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")),
                     reports.getString("title"));
             reportsList.add(report);
-            try {
-                ResultSet suggestionSet = connect.getSuggestion(report.getId());
-                ObservableList<Suggestion> tempSuggest = FXCollections.observableArrayList();
 
-                while (suggestionSet.next()){
-                    tempSuggest.add(new Suggestion(suggestionSet.getInt("id"), report,
-                            suggestionSet.getString("suggestionText"),
-                            LocalDate.parse(suggestionSet.getString("createdAt"))));
-                }
-
-                Suggestion[] suggestions = new Suggestion[tempSuggest.size()];
-                int c = 0;
-                for (Suggestion suggestion: tempSuggest){
-                    suggestions[c] = suggestion;
-                    c++;
-                }
-
-                report.setSuggestions(suggestions);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notifications error = Notifications.create().text(e.getMessage()).title("Loading suggestions Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
-                error.showError();
-            }
-
-            try {
-                ObservableList<Project> tempProject = FXCollections.observableArrayList();
-                ResultSet projectSet = connect.getProjects(report.getId());
-                while (projectSet.next()){
-                    tempProject.add(new Project(projectSet.getInt("id"), report,
-                            projectSet.getString("projectsText"),
-                            LocalDate.parse(projectSet.getString("createdAt"))));
-                }
-
-                Project[] projects = new Project[tempProject.size()];
-                int c = 0;
-                for (Project project: tempProject){
-                    projects[c] = project;
-                    c++;
-                }
-                report.setProjects(projects);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notifications error = Notifications.create().text(e.getMessage()).title("Loading Projects Error").position(Pos.BASELINE_LEFT).hideAfter(Duration.hours(1));
-                error.showError();
-            }
-
-            try {
-                ObservableList<UploadedImages> uploadedImages = FXCollections.observableArrayList();
-                ResultSet images = connect.getImages(report.getId());
-                while (images.next()){
-                    // add imageView to observable list
-                    ImageView imageView = new ImageView();
-                    imageView.setImage(new Image(urlToImages+images.getString("imageNewName")));
-                    uploadedImages.add(new UploadedImages(imageView, images.getString("imageName"), images.getString("imageNewName")));
-
-                }
-                report.setUploadedImagesList(uploadedImages);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
     }
@@ -230,7 +236,12 @@ public class Filtering {
                 if (b || report == null || report.getCategory() == null) {
                     setText(null);
                 } else {
-                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle());
+                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
+                    setFont(Font.font(19));
+                    setMaxWidth(param.getWidth());
+                    setPrefWidth(param.getWidth());
+                    setMinWidth(param.getWidth());
+                    setWrapText(true);
                 }
             }
         });
@@ -238,19 +249,23 @@ public class Filtering {
         searchListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Report>() {
             @Override
             public void changed(ObservableValue<? extends Report> observableValue, Report report, Report t1) {
-                WebEngine webEngine = webView.getEngine();
-                webEngine.loadContent(t1.getReportText(), "text/html");
-                suggestionObservableList.clear();
-                suggestionObservableList.addAll(t1.getSuggestions());
-                suggestionsList.setItems(suggestionObservableList);
+                if(t1 != null){
+                    selectedReport = t1;
+                    loadReportData(t1);
+                    WebEngine webEngine = webView.getEngine();
+                    webEngine.loadContent(t1.getReportText(), "text/html");
+                    suggestionObservableList.clear();
+                    suggestionObservableList.addAll(t1.getSuggestions());
+                    suggestionsList.setItems(suggestionObservableList);
 
-                projectObservableList.clear();
-                projectObservableList.addAll(t1.getProjects());
-                projectsList.setItems(projectObservableList);
+                    projectObservableList.clear();
+                    projectObservableList.addAll(t1.getProjects());
+                    projectsList.setItems(projectObservableList);
 
-                uploadedImagesToShow.clear();
-                uploadedImagesToShow.addAll(t1.getUploadedImagesList());
-                listOfImages.setItems(uploadedImagesToShow);
+                    uploadedImagesToShow.clear();
+                    uploadedImagesToShow.addAll(t1.getUploadedImagesList());
+                    listOfImages.setItems(uploadedImagesToShow);
+                }
             }
         });
 
@@ -360,6 +375,22 @@ public class Filtering {
     @FXML
     private void preview(){
 
+    }
+
+    @FXML
+    private void export(){
+
+        Parent root = null;
+        try {
+            root = FXMLLoader.load(getClass().getResource("previewToExport.fxml"));
+            modal = new Stage();
+            modal.setScene(new Scene(root));
+            modal.initModality(Modality.APPLICATION_MODAL);
+            modal.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

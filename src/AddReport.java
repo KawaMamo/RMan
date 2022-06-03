@@ -66,6 +66,7 @@ public class AddReport {
     ObservableList<UploadedImages> uploadedImages = FXCollections.observableArrayList();
 
     Config config;
+    String urlToImages;
 
     public static int editId = 0;
 
@@ -97,6 +98,8 @@ public class AddReport {
 
         try {
             connect = new Connect();
+            config  = new Config();
+            urlToImages = config.getProp().getProperty("imageUrl");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("connection error");
@@ -149,11 +152,7 @@ public class AddReport {
             }
         });
 
-        try {
-            config = new Config();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         listOfImages.setItems(uploadedImages);
 
@@ -223,6 +222,14 @@ public class AddReport {
                 k++;
             }
             report.setProjects(projectsArray);
+
+            ResultSet imagesSet = connect.getImages(report.getId());
+            while (imagesSet.next()){
+                ImageView imageView = new ImageView();
+                imageView.setImage(new Image(urlToImages+imagesSet.getString("imageNewName")));
+                uploadedImages.add(new UploadedImages(imageView, imagesSet.getString("imageName"), imagesSet.getString("imageNewName")));
+            }
+            report.setUploadedImagesList(uploadedImages);
 
             htmlEditor.setHtmlText(report.getReportText());
             submitBtn.setText("update");

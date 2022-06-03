@@ -92,4 +92,5 @@ public class SubCatGrid {
     private void goHome() throws IOException {
         Main.changeScene("catGridView.fxml");
     }
+
 }

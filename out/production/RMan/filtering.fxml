@@ -97,14 +97,27 @@
             <DatePicker fx:id="reportDate" />
          </children>
       </HBox>
-      <Button mnemonicParsing="false" onAction="#goHome" prefHeight="38.0" prefWidth="48.0" GridPane.columnIndex="1">
-         <graphic>
-            <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@icons/home-icon2.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
+      <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1">
+         <children>
+            <Button mnemonicParsing="false" onAction="#goHome" prefHeight="38.0" prefWidth="48.0" GridPane.columnIndex="1">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/home-icon2.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#export" prefHeight="38.0" prefWidth="48.0">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/724827.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
    </children>
 </GridPane>
