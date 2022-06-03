@@ -36,8 +36,7 @@ public class SubCatGrid {
                 int id = subCats.getInt("id");
                 Button button = new Button(subCategoryName);
                 button.wrapTextProperty().set(true);
-                System.out.println("((140/numberOfRows)-subCategoryName.length()) "+((140/numberOfRows)-subCategoryName.length())+" - "+subCategoryName.length());
-                button.setStyle("-fx-font-size:"+((140/numberOfRows)-(int)(subCategoryName.length()*0.8))+"pt;-fx-wrap-text : true;");
+                 button.setStyle("-fx-font-size:"+((140/numberOfRows)-(int)(subCategoryName.length()*0.8))+"pt;-fx-wrap-text : true;");
                 button.setMaxWidth(Double.MAX_VALUE);
                 button.setMaxHeight(Double.MAX_VALUE);
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {

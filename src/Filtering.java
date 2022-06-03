@@ -5,15 +5,21 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
@@ -34,7 +40,7 @@ public class Filtering {
     @FXML
     private ListView<Report> searchListView;
 
-    ObservableList<Report> reportsList = FXCollections.observableArrayList();
+    public static ObservableList<Report> reportsList = FXCollections.observableArrayList();
 
     @FXML
     private WebView webView;
@@ -69,6 +75,8 @@ public class Filtering {
 
     ObservableList<Suggestion> suggestionObservableList = FXCollections.observableArrayList();
     ObservableList<Project> projectObservableList = FXCollections.observableArrayList();
+
+    public static Stage modal;
 
     @FXML
     void search() {
@@ -256,6 +264,20 @@ public class Filtering {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }else if(event.getButton().equals(MouseButton.SECONDARY)){
+                    Parent root = null;
+                    try {
+                        AreYouSure.report = searchListView.getSelectionModel().getSelectedItem();
+                        root = FXMLLoader.load(getClass().getResource("areYouSure.fxml"));
+                        modal = new Stage();
+                        modal.setScene(new Scene(root));
+                        modal.initModality(Modality.APPLICATION_MODAL);
+                        modal.show();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         });
