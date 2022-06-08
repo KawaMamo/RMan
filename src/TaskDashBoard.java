@@ -5,16 +5,22 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import org.controlsfx.control.Notifications;
+
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 
 
 public class TaskDashBoard {
@@ -30,10 +36,14 @@ public class TaskDashBoard {
 
     private int dayOfMonth;
 
-    private int year;
-    private int month;
+    public static int year;
+    public static int month;
 
-    DecimalFormat formatter = new DecimalFormat("00");
+    public static LocalDate dutyTime;
+
+    static DecimalFormat formatter = new DecimalFormat("00");
+
+    static Connect connect;
 
     @FXML
     private ListView<Duty> listOfDuties;
@@ -42,6 +52,13 @@ public class TaskDashBoard {
 
     @FXML
     private void initialize(){
+
+        try {
+            connect = new Connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Notifications.create().title("unable to connect db").text(e.getMessage()).showError();
+        }
 
         year = LocalDate.now().getYear();
         month = LocalDate.now().getMonthValue();
@@ -70,6 +87,27 @@ public class TaskDashBoard {
             }
         });
         listOfDuties.setItems(observableList);
+
+        listOfDuties.setCellFactory(param -> new ListCell<Duty>(){
+            @Override
+            protected void updateItem(Duty report, boolean b) {
+                super.updateItem(report, b);
+                if (b || report == null || report.getDescription() == null) {
+                    setText(null);
+                } else {
+                    setText(report.getDescription());
+                    setMaxWidth(param.getWidth());
+                    setPrefWidth(param.getWidth());
+                    setMinWidth(param.getWidth());
+                    setWrapText(true);
+                    setStyle("-fx-font-size: 20;-fx-font-weight: bold;");
+                }
+            }
+        });
+
+
+
+
     }
 
     @FXML
@@ -79,7 +117,15 @@ public class TaskDashBoard {
 
     public static void setList(int day){
         observableList.clear();
-        observableList.add(new Duty("this duty", 1));
+        try {
+            ResultSet duties = connect.getDuties(LocalDate.parse(year+"-"+formatter.format(month)+"-"+formatter.format(day)));
+            while (duties.next()){
+                observableList.add(new Duty(duties.getString("description"), 1, LocalDate.parse(duties.getString("createdAt"))));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void setCalender(int year, int month){
@@ -167,6 +213,11 @@ public class TaskDashBoard {
         year = (year >1000 ? --year : year);
         yearTF.setText(String.valueOf(year));
         setCalender(year, month);
+    }
+
+    public static void setDutyTime(int day){
+        dutyTime = LocalDate.parse(year+"-"+formatter.format(month)+"-"+formatter.format(day));
+        System.out.println(dutyTime.toString());
     }
 
 }

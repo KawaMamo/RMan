@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="796.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TaskDashBoard">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="575.0" prefWidth="796.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TaskDashBoard">
   <columnConstraints>
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="300.0" minWidth="0.0" prefWidth="300.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
@@ -50,33 +50,33 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Tue" GridPane.columnIndex="3">
+                  <Label text="ثلاثاء" GridPane.columnIndex="3">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font></Label>
-                  <Label text="Wen" GridPane.columnIndex="4">
+                  <Label text="أربعاء" GridPane.columnIndex="4">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font></Label>
-                  <Label text="Thur" GridPane.columnIndex="5">
+                  <Label text="خميس" GridPane.columnIndex="5">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font></Label>
-                  <Label text="Fri" GridPane.columnIndex="6">
+                  <Label text="جمعة" GridPane.columnIndex="6">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font></Label>
-                  <Label text="Sun" GridPane.columnIndex="1">
+                  <Label text="أحد" GridPane.columnIndex="1">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Label text="Sat">
+                  <Label text="سبت">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
-                  <Label text="Mon" GridPane.columnIndex="2">
+                  <Label text="إثنين" GridPane.columnIndex="2">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font></Label>
@@ -86,13 +86,12 @@
       </GridPane>
       <HBox alignment="CENTER" spacing="4.0" GridPane.columnIndex="1">
          <children>
-            <Button mnemonicParsing="false" onAction="#minusYear" text="&lt;" />
-            <TextField fx:id="yearTF" alignment="CENTER" GridPane.columnIndex="1" />
             <Button mnemonicParsing="false" onAction="#plusYear" text="&gt;" />
-            <Button mnemonicParsing="false" onAction="#minusMonth" text="&lt;" />
-            <TextField fx:id="monthTF" alignment="CENTER" />
+            <TextField fx:id="yearTF" alignment="CENTER" GridPane.columnIndex="1" />
+            <Button mnemonicParsing="false" onAction="#minusYear" text="&lt;" />
             <Button mnemonicParsing="false" onAction="#plusMonth" text="&gt;" />
-            <Button mnemonicParsing="false" text="Today" />
+            <TextField fx:id="monthTF" alignment="CENTER" />
+            <Button mnemonicParsing="false" onAction="#minusMonth" text="&lt;" />
          </children>
       </HBox>
       <Button mnemonicParsing="false" onAction="#goHome" prefHeight="38.0" prefWidth="48.0">

@@ -165,6 +165,32 @@ public class Connect {
         return insertedId;
     }
 
+    public int addDuty(LocalDate dutyTime, String description) throws Exception{
+
+        int insertedId = 0;
+        try {
+            preparedStatement = connect
+                    .prepareStatement("insert into duties values (default, ?, ?, default)", statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, description);
+            preparedStatement.setString(2, dutyTime.toString());
+            int rowAffected = preparedStatement.executeUpdate();
+            ResultSet rs = null;
+            if(rowAffected == 1)
+            {
+                rs = preparedStatement.getGeneratedKeys();
+                if(rs.next())
+                    insertedId = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+
+        }
+
+        return insertedId;
+    }
+
     public int addProject(int reportId, String text) throws Exception{
 
         int insertedId = 0;
@@ -258,6 +284,18 @@ public class Connect {
         String query = "SELECT * FROM suggestions s WHERE reportId = ? ";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         preparedStatement.setInt(1, reportId);
+        resultSet = preparedStatement.executeQuery();
+
+        return resultSet;
+
+    }
+
+    public ResultSet getDuties(LocalDate day) throws Exception {
+        ResultSet resultSet = null;
+
+        String query = "SELECT * FROM duties d WHERE createdAt = ? ";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        preparedStatement.setString(1, day.toString());
         resultSet = preparedStatement.executeQuery();
 
         return resultSet;

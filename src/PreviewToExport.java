@@ -33,16 +33,16 @@ public class PreviewToExport {
 
         WebEngine webEngine = webView.getEngine();
         String reportHtml[] = report.getReportText().split("</body>");
-        htmlPage = reportHtml[0]+"<h1>Projects</h1><ol>";
+        htmlPage = reportHtml[0]+"<h1>المشاريع</h1><ol>";
         for (Project project: report.getProjects()){
             htmlPage +="<li>"+project.getProjectsText()+"</li>";
         }
-        htmlPage += "</ol><h1>suggestions</h1><ol>";
+        htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
         for (Suggestion suggestion:report.getSuggestions()){
             htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
         }
 
-        htmlPage += "</ol><h1>images</h1><table width=\"100%\">";
+        htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
         for (UploadedImages images: report.getUploadedImagesList()){
             htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
         }
