@@ -13,8 +13,17 @@ public class Report {
     private Project[] projects;
     private List<UploadedImages> uploadedImagesList;
     private String title;
+    private int isRead;
 
-    public Report(int id, LocalDate reportDate, CategoryClass category, SubCat subCat, String reportText, LocalDate createdAt, String title) {
+    public int getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(int isRead) {
+        this.isRead = isRead;
+    }
+
+    public Report(int id, LocalDate reportDate, CategoryClass category, SubCat subCat, String reportText, LocalDate createdAt, String title, int isRead) {
         this.id = id;
         this.reportDate = reportDate;
         this.category = category;
@@ -22,6 +31,7 @@ public class Report {
         this.reportText = reportText;
         this.createdAt = createdAt;
         this.title = title;
+        this.isRead = isRead;
     }
 
     public List<UploadedImages> getUploadedImagesList() {

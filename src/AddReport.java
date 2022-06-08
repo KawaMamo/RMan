@@ -189,7 +189,7 @@ public class AddReport {
                 SubCat subCat = new SubCat(reportData.getInt("subCatId"), reportData.getString("subCatName"), categoryObject);
                 report = new Report(editId, LocalDate.parse(reportData.getString("reportDate")), categoryObject, subCat
                         , reportData.getString("reportText"), LocalDate.parse(reportData.getString("createdAt")),
-                        reportData.getString("title"));
+                        reportData.getString("title"), reportData.getInt("isRead"));
             }
             ResultSet suggestionSet = connect.getSuggestion(editId);
             List<Suggestion> suggestionArray = new ArrayList<>();
@@ -330,7 +330,7 @@ public class AddReport {
             submitBtn.setDisable(false);
 
             if(id != 0){
-                Notifications.create().title("Success").text("Report details added successfully").hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showConfirm();
+                Notifications.create().title("Success").text("Report details added successfully").position(Pos.BOTTOM_RIGHT).showConfirm();
                 submitBtn.setText("Add new");
             }else {
                 Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();

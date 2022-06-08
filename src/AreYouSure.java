@@ -7,6 +7,7 @@ public class AreYouSure {
     public static int deleteId = 0;
     public static Report report = null;
     Connect connect;
+    public static String caller;
     @FXML
     private void delete(){
         try {
@@ -21,16 +22,33 @@ public class AreYouSure {
         connect.deleteProjects(deleteId);
         connect.deleteSuggestion(deleteId);
         connect.deleteUploadedImages(deleteId);
-        Filtering.modal.close();
-        try {
-            Main.changeScene("Filtering.fxml");
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(caller== "ReportsDetails"){
+            ReportsDetails.modal.close();
+            try {
+                Main.changeScene("reportsDetails.fxml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else if(caller == "Filtering"){
+            Filtering.modal.close();
+            try {
+                Main.changeScene("filtering.fxml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+
     }
 
     @FXML
     private void cancel(){
-        Filtering.modal.close();
+
+        if(caller== "ReportsDetails"){
+            ReportsDetails.modal.close();
+        }else if(caller == "Filtering"){
+            Filtering.modal.close();
+        }
+
     }
 }

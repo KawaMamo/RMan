@@ -115,7 +115,7 @@ public class Connect {
         int insertedId = 0;
         try {
             preparedStatement = connect
-                    .prepareStatement("insert into report values (default, ?, ?, ?, ?, default, ?)", statement.RETURN_GENERATED_KEYS);
+                    .prepareStatement("insert into report values (default, ?, ?, ?, ?, default, ?, default)", statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, reportDate.toString());
             preparedStatement.setInt(2, catId);
@@ -484,5 +484,19 @@ public class Connect {
         }
 
         return insertedId;
+    }
+
+    public int setAsRead(int id) {
+        int rowAffected = 0;
+        String query = "UPDATE report SET isRead = 1 WHERE id = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
     }
 }

@@ -2,6 +2,7 @@ import javafx.fxml.FXML;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
+import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,11 +13,24 @@ public class PreviewToExport {
     private WebView webView;
     Report report;
     String htmlPage;
+    public static String caller = null;
+    Config config;
 
     @FXML
     private void initialize(){
+        try {
+            config = new Config();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Notifications.create().title("error loading config").text(e.getMessage()).showError();
+        }
 
-        report = Filtering.selectedReport;
+        if(caller == "Filtering"){
+            report = Filtering.selectedReport;
+        }else if (caller == "ReportsDetails"){
+            report = ReportsDetails.selectedReport;
+        }
+
         WebEngine webEngine = webView.getEngine();
         String reportHtml[] = report.getReportText().split("</body>");
         htmlPage = reportHtml[0]+"<h1>Projects</h1><ol>";
@@ -27,7 +41,14 @@ public class PreviewToExport {
         for (Suggestion suggestion:report.getSuggestions()){
             htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
         }
-        htmlPage +="</ol><h4>reported at "+report.getReportDate()+"</h4></body></html>";
+
+        htmlPage += "</ol><h1>images</h1><table width=\"100%\">";
+        for (UploadedImages images: report.getUploadedImagesList()){
+            htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+        }
+        htmlPage += "</table>";
+
+        htmlPage +="<h4>reported at "+report.getReportDate()+" by "+report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" titled "+report.getTitle()+"</h4></body></html>";
         webEngine.loadContent(htmlPage, "text/html");
     }
 

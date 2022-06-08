@@ -80,10 +80,12 @@ public class Filtering {
     public static Stage modal;
     public static Report selectedReport;
 
+    Map<String, String> whereClauseArgs = new HashMap<>();
+
     @FXML
     void search() {
 
-        Map<String, String> whereClauseArgs = new HashMap<>();
+
 
         if(searchTF.getText() != null){
             whereClauseArgs.put("reportText", searchTF.getText());
@@ -183,7 +185,7 @@ public class Filtering {
             Report report = new Report(reports.getInt("id"), LocalDate.parse(reports.getString("reportDate")),
                     categoryClass, new SubCat(reports.getInt("subCatId"), reports.getString("subCatName"),
                     categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")),
-                    reports.getString("title"));
+                    reports.getString("title"), reports.getInt("isRead"));
             reportsList.add(report);
 
         }
@@ -237,11 +239,17 @@ public class Filtering {
                     setText(null);
                 } else {
                     setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
-                    setFont(Font.font(19));
                     setMaxWidth(param.getWidth());
                     setPrefWidth(param.getWidth());
                     setMinWidth(param.getWidth());
                     setWrapText(true);
+                    setStyle("-fx-font-size: 18;");
+                    if(report.getIsRead()==0){
+                        setStyle("-fx-font-weight: bold;");
+                    }else if(report.getIsRead()==1){
+                        setStyle("-fx-font-weight: normal;");
+                    }
+
                 }
             }
         });
@@ -265,6 +273,16 @@ public class Filtering {
                     uploadedImagesToShow.clear();
                     uploadedImagesToShow.addAll(t1.getUploadedImagesList());
                     listOfImages.setItems(uploadedImagesToShow);
+
+                    if(t1.getIsRead() == 0){
+                        try {
+                            connect.setAsRead(t1.getId());
+                            loadReports(whereClauseArgs);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.out.println(e.getMessage());
+                        }
+                    }
                 }
             }
         });
@@ -283,6 +301,7 @@ public class Filtering {
                     Parent root = null;
                     try {
                         AreYouSure.report = searchListView.getSelectionModel().getSelectedItem();
+                        AreYouSure.caller = "Filtering";
                         root = FXMLLoader.load(getClass().getResource("areYouSure.fxml"));
                         modal = new Stage();
                         modal.setScene(new Scene(root));
@@ -382,6 +401,7 @@ public class Filtering {
 
         Parent root = null;
         try {
+            PreviewToExport.caller = "Filtering";
             root = FXMLLoader.load(getClass().getResource("previewToExport.fxml"));
             modal = new Stage();
             modal.setScene(new Scene(root));

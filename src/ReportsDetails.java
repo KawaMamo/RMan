@@ -5,15 +5,22 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
@@ -27,8 +34,7 @@ import java.util.Set;
 
 public class ReportsDetails {
 
-    @FXML
-    private ListView<Project> projectsList;
+    String htmlPage;
 
     @FXML
     private ListView<Report> searchListView;
@@ -45,20 +51,16 @@ public class ReportsDetails {
     private Button searchBtn;
 
     @FXML
-    private ListView<Suggestion> suggestionsList;
-
-    @FXML
     private TextField searchTF;
 
     Connect connect;
     Config config;
     String urlToImages;
+    public static Stage modal;
+    public static Report selectedReport;
 
     ObservableList<Suggestion> suggestionObservableList = FXCollections.observableArrayList();
     ObservableList<Project> projectObservableList = FXCollections.observableArrayList();
-
-    @FXML
-    private ListView<UploadedImages> listOfImages;
 
     ObservableList<UploadedImages> uploadedImagesToShow = FXCollections.observableArrayList();
 
@@ -164,7 +166,7 @@ public class ReportsDetails {
             Report report = new Report(reports.getInt("id"), LocalDate.parse(reports.getString("reportDate")),
                     categoryClass, new SubCat(reports.getInt("subCatId"), reports.getString("subCatName"),
                     categoryClass), reports.getString("reportText"), LocalDate.parse(reports.getString("createdAt")),
-                    reports.getString("title"));
+                    reports.getString("title"), reports.getInt("isRead"));
             reportsList.add(report);
 
         }
@@ -192,11 +194,16 @@ public class ReportsDetails {
                     setText(null);
                 } else {
                     setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
-                    setFont(Font.font(19));
                     setMaxWidth(param.getWidth());
                     setPrefWidth(param.getWidth());
                     setMinWidth(param.getWidth());
                     setWrapText(true);
+                    setStyle("-fx-font-size: 18;");
+                    if(report.getIsRead()==0){
+                        setStyle("-fx-font-weight: bold;");
+                    }else if(report.getIsRead()==1){
+                        setStyle("-fx-font-weight: normal;");
+                    }
                 }
             }
         });
@@ -205,47 +212,53 @@ public class ReportsDetails {
             @Override
             public void changed(ObservableValue<? extends Report> observableValue, Report report, Report t1) {
                 if(t1 != null){
+                    selectedReport = t1;
                     loadReportData(t1);
-                    WebEngine webEngine = webView.getEngine();
-                    webEngine.loadContent(t1.getReportText(), "text/html");
+                    System.out.println();
                     suggestionObservableList.clear();
                     suggestionObservableList.addAll(t1.getSuggestions());
-                    suggestionsList.setItems(suggestionObservableList);
 
                     projectObservableList.clear();
                     projectObservableList.addAll(t1.getProjects());
-                    projectsList.setItems(projectObservableList);
 
                     uploadedImagesToShow.clear();
                     uploadedImagesToShow.addAll(t1.getUploadedImagesList());
-                    listOfImages.setItems(uploadedImagesToShow);
+
+                    if(t1.getIsRead() == 0){
+                        try {
+                            connect.setAsRead(t1.getId());
+                            loadReports(whereClauseArgs);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.out.println(e.getMessage());
+                        }
+                    }
+
+                    WebEngine webEngine = webView.getEngine();
+
+                    String reportHtml[] = t1.getReportText().split("</body>");
+                    htmlPage = reportHtml[0]+"<h1>المشاريع</h1><ol>";
+                    for (Project project: t1.getProjects()){
+                        htmlPage +="<li>"+project.getProjectsText()+"</li>";
+                    }
+                    htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
+                    for (Suggestion suggestion:t1.getSuggestions()){
+                        htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
+                    }
+
+                    htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
+                    for (UploadedImages images: t1.getUploadedImagesList()){
+                        htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+                    }
+                    htmlPage += "</table>";
+
+                    htmlPage +="<h4>reported at "+t1.getReportDate()+" by "+t1.getCategory().getCatName()+" :: "+t1.getSubCat().getSubCatName()+" titled "+t1.getTitle()+"</h4></body></html>";
+                    webEngine.loadContent(htmlPage, "text/html");
+
                 }
             }
         });
 
-        suggestionsList.setCellFactory(param -> new ListCell<Suggestion>(){
-            @Override
-            protected void updateItem(Suggestion suggestion, boolean b){
-                super.updateItem(suggestion, b);
-                if (b || suggestion == null || suggestion.getSuggestionText() == null) {
-                    setText(null);
-                } else {
-                    setText(suggestion.getSuggestionText());
-                }
-            }
-        });
-
-        projectsList.setCellFactory(param -> new ListCell<Project>(){
-            @Override
-            protected void updateItem(Project project, boolean b){
-                super.updateItem(project, b);
-                if (b || project == null || project.getProjectsText() == null) {
-                    setText(null);
-                } else {
-                    setText(project.getProjectsText());
-                }
-            }
-        });
 
         webView.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
@@ -268,26 +281,15 @@ public class ReportsDetails {
             }
         });
 
-        listOfImages.setCellFactory(param -> new ListCell<UploadedImages>(){
-            @Override
-            public void updateItem(UploadedImages uploadedImages, boolean empty) {
-                super.updateItem(uploadedImages, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(uploadedImages.getImageName());
-                    setGraphic(uploadedImages.getImageView());
-                }
-            }
-        });
+
         whereClauseArgs.put("subCatId", String.valueOf(SubCatGrid.subCatId));
+        whereClauseArgs.put("isRead", String.valueOf(0));
         try {
             loadReports(whereClauseArgs);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        whereClauseArgs.remove("isRead");
 
     }
 
@@ -311,5 +313,22 @@ public class ReportsDetails {
     @FXML
     private void preview(){
 
+    }
+
+    @FXML
+    private void export(){
+
+        Parent root = null;
+        try {
+            PreviewToExport.caller = "ReportsDetails";
+            root = FXMLLoader.load(getClass().getResource("previewToExport.fxml"));
+            modal = new Stage();
+            modal.setScene(new Scene(root));
+            modal.initModality(Modality.APPLICATION_MODAL);
+            modal.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
