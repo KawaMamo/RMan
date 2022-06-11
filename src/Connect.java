@@ -292,7 +292,6 @@ public class Connect {
 
     public ResultSet getDuties(LocalDate day) throws Exception {
         ResultSet resultSet = null;
-
         String query = "SELECT * FROM duties d WHERE createdAt = ? ";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         preparedStatement.setString(1, day.toString());
@@ -352,6 +351,21 @@ public class Connect {
         try {
             preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, id);
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
+    public int deleteDuties(LocalDate date) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM duties WHERE createdAt = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, date.toString());
             rowAffected = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -449,6 +463,7 @@ public class Connect {
         ResultSet resultSet = null;
         String where = " ";
         int j = 0;
+
         for (Map.Entry<String, String> entry: whereClause.entrySet()){
             if(j == 0){
                 where += " WHERE ";

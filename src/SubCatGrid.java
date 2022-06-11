@@ -62,7 +62,7 @@ public class SubCatGrid {
             RowConstraints[] rowConstraintses = new RowConstraints[numberOfRows];
 
             for (int s = 0 ; s < numberOfRows-1 ; s++) {
-                System.out.println(s);
+
                 columnConstraintses[s] = new ColumnConstraints();
                 columnConstraintses[s].setPercentWidth(100/(numberOfRows));
                 columnConstraintses[s].setHalignment(HPos.CENTER);

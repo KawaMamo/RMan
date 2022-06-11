@@ -297,7 +297,7 @@ public class AddReport {
                 id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
             } catch (Exception e) {
                 e.printStackTrace();
-                Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
             }
             int check = 0;
             for (String object: suggestions){
@@ -305,7 +305,7 @@ public class AddReport {
                     connect.addSuggestion(id, object);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
@@ -314,7 +314,7 @@ public class AddReport {
                     check = connect.addProject(id, object);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
@@ -323,7 +323,7 @@ public class AddReport {
                     check = connect.addImage(id, object.getImageName(), object.getNewName());
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error adding Images").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
@@ -333,7 +333,7 @@ public class AddReport {
                 Notifications.create().title("Success").text("Report details added successfully").position(Pos.BOTTOM_RIGHT).showConfirm();
                 submitBtn.setText("Add new");
             }else {
-                Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();
+                Notifications.create().title("Error").text("Something went wrong").position(Pos.TOP_LEFT).showError();
                 submitBtn.setText("Try Again");
             }
 
@@ -351,7 +351,7 @@ public class AddReport {
                 id = connect.addReport(dateTF.getValue(),categoryCB.getValue().getCatId(), subCatCB.getValue().getSubCatId(), htmlEditor.getHtmlText(), titleTF.getText());
             } catch (Exception e) {
                 e.printStackTrace();
-                Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
             }
             int check = 0;
             for (String object: suggestions){
@@ -359,7 +359,7 @@ public class AddReport {
                     connect.addSuggestion(id, object);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
@@ -368,7 +368,7 @@ public class AddReport {
                     check = connect.addProject(id, object);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
@@ -377,17 +377,17 @@ public class AddReport {
                     check = connect.addImage(id, object.getImageName(), object.getNewName());
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    Notifications.create().title("Error adding Images").text(e.getMessage()).hideAfter(Duration.minutes(15)).position(Pos.BOTTOM_RIGHT).showError();
+                    Notifications.create().title("Error adding Images").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
                 }
             }
 
             submitBtn.setDisable(false);
 
             if(id != 0){
-                Notifications.create().title("Success").text("Report details added successfully").hideAfter(Duration.hours(1)).position(Pos.BOTTOM_RIGHT).showConfirm();
+                Notifications.create().title("Success").text("Report details added successfully").position(Pos.BOTTOM_RIGHT).showConfirm();
                 submitBtn.setText("Add new");
             }else {
-                Notifications.create().title("Error").text("Something went wrong").hideAfter(Duration.hours(1)).position(Pos.TOP_LEFT).showError();
+                Notifications.create().title("Error").text("Something went wrong").position(Pos.TOP_LEFT).showError();
                 submitBtn.setText("Try Again");
             }
         }
@@ -405,7 +405,7 @@ public class AddReport {
         // file chooser with specific extensions
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(".jpg .PNG Files Only", "*.png", "*.jpg")
+                new FileChooser.ExtensionFilter(".jpg .PNG Files Only", "*.png", "*.jpg", "*.pdf")
         );
         List<File> fileArray = fileChooser.showOpenMultipleDialog(Main.stagePointer);
 
@@ -414,7 +414,13 @@ public class AddReport {
             ImageView imageView = new ImageView();
             imageView.setImage(new Image(file.toURI().toURL().toExternalForm()));
 
-            String newFileName = System.currentTimeMillis()+".png";
+            String extension = "png";
+            int index = file.getName().lastIndexOf('.');
+            if (index > 0) {
+                extension = file.getName().substring(index + 1);
+            }
+
+            String newFileName = System.currentTimeMillis()+"."+extension;
 
             uploadedImages.add(new UploadedImages(imageView, file.getName(), newFileName));
 

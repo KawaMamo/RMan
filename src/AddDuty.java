@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import org.controlsfx.control.Notifications;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 
 public class AddDuty {
 
@@ -18,10 +19,18 @@ public class AddDuty {
 
     @FXML
     private ListView<String> dutiesList;
+    Connect connect;
+    boolean isEdit =false;
+
 
     @FXML
     private void initialize(){
 
+        try {
+            connect = new Connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dutiesList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -30,6 +39,17 @@ public class AddDuty {
         });
 
         dutiesList.setItems(duties);
+
+        try {
+            ResultSet dutiesSet = connect.getDuties(TaskDashBoard.dutyTime);
+            while (dutiesSet.next()){
+                duties.add(dutiesSet.getString("description"));
+                isEdit = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notifications.create().title("unable to load duties").text(e.getMessage()).showError();
+        }
     }
 
     @FXML
@@ -54,7 +74,10 @@ public class AddDuty {
     private void submit(){
 
         try {
-            Connect connect = new Connect();
+            if(isEdit){
+                connect.deleteDuties(TaskDashBoard.dutyTime);
+            }
+
             int check = 0;
             for(String object : duties){
                 check = connect.addDuty(TaskDashBoard.dutyTime, object);

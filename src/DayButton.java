@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class DayButton extends Button {
 
     //int clickCounter = 1;
+    Connect connect;
 
     DayButton(String name){
 
@@ -20,13 +21,14 @@ public class DayButton extends Button {
         setStyle("-fx-font-size:20pt;");
 
         try {
-            Connect connect = new Connect();
+            connect = new Connect();
             DecimalFormat formatter = new DecimalFormat("00");
             if(connect.getDuties(LocalDate.parse(TaskDashBoard.year+"-"+formatter.format(TaskDashBoard.month)+"-"+formatter.format(Integer.valueOf(name)))).next()){
                 setStyle("-fx-background-color:#58D68D;-fx-font-size:20pt;");
             }else {
                 setStyle("-fx-font-size:20pt;");
             }
+            connect.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -38,6 +40,7 @@ public class DayButton extends Button {
             if (mouseEvent.getButton() == MouseButton.PRIMARY){
                 TaskDashBoard.setList(Integer.valueOf(name));
             }else if(mouseEvent.getButton() == MouseButton.SECONDARY){
+                TaskDashBoard.setDutyTime(Integer.parseInt(name));
                 Stage stage = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addDuty.fxml"));
                 try {
@@ -48,7 +51,6 @@ public class DayButton extends Button {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                TaskDashBoard.setDutyTime(Integer.parseInt(name));
             }
 
             /*if(clickCounter %2==0){
