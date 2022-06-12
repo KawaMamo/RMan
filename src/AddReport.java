@@ -3,13 +3,18 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
@@ -65,6 +70,7 @@ public class AddReport {
 
     public static int editId = 0;
 
+    public static Stage modal;
 
 
     @FXML
@@ -331,7 +337,24 @@ public class AddReport {
 
     @FXML
     private void addNew(){
-        reset();
+        if(AreYouSureNew.status){
+            reset();
+            AreYouSureNew.status = false;
+        }else {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("areYouSureNew.fxml"));
+                modal = new Stage();
+                modal.setScene(new Scene(root));
+                modal.initModality(Modality.APPLICATION_MODAL);
+                modal.show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 
     @FXML

@@ -386,6 +386,15 @@ public class Filtering {
         });
 
 
+        whereClauseArgs.put("isRead", String.valueOf(0));
+        try {
+            loadReports(whereClauseArgs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        whereClauseArgs.remove("isRead");
+
+
     }
 
     @FXML
