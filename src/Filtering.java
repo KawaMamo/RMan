@@ -11,6 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -24,8 +26,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -35,9 +40,8 @@ import java.util.Set;
 
 public class Filtering {
 
-    @FXML
-    private ListView<Project> projectsList;
 
+    String htmlPage;
     @FXML
     private ListView<Report> searchListView;
 
@@ -56,16 +60,10 @@ public class Filtering {
     private Button searchBtn;
 
     @FXML
-    private ListView<Suggestion> suggestionsList;
-
-    @FXML
     private ChoiceBox<SubCat> subCatCB;
 
     @FXML
     private TextField searchTF;
-
-    @FXML
-    private ListView<UploadedImages> listOfImages;
 
     ObservableList<UploadedImages> uploadedImagesToShow = FXCollections.observableArrayList();
 
@@ -260,19 +258,14 @@ public class Filtering {
                 if(t1 != null){
                     selectedReport = t1;
                     loadReportData(t1);
-                    WebEngine webEngine = webView.getEngine();
-                    webEngine.loadContent(t1.getReportText(), "text/html");
                     suggestionObservableList.clear();
                     suggestionObservableList.addAll(t1.getSuggestions());
-                    suggestionsList.setItems(suggestionObservableList);
 
                     projectObservableList.clear();
                     projectObservableList.addAll(t1.getProjects());
-                    projectsList.setItems(projectObservableList);
 
                     uploadedImagesToShow.clear();
                     uploadedImagesToShow.addAll(t1.getUploadedImagesList());
-                    listOfImages.setItems(uploadedImagesToShow);
 
                     if(t1.getIsRead() == 0){
                         try {
@@ -280,9 +273,64 @@ public class Filtering {
                             loadReports(whereClauseArgs);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.out.println(e.getMessage());
                         }
                     }
+
+                    WebEngine webEngine = webView.getEngine();
+                    String reportHtml[] = t1.getReportText().split("</body>");
+                    htmlPage = reportHtml[0];
+                    if(projectObservableList.size()>0){
+                        htmlPage = "<h1>المشاريع</h1><ol>";
+                        for (Project project: t1.getProjects()){
+                            htmlPage +="<li>"+project.getProjectsText()+"</li>";
+                        }
+                    }
+
+                    if(suggestionObservableList.size()>0){
+                        htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
+                        for (Suggestion suggestion:t1.getSuggestions()){
+                            htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
+                        }
+                    }
+
+                    if(uploadedImagesToShow.size()>0){
+                        htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
+                        for (UploadedImages images: t1.getUploadedImagesList()){
+                            String[] extension = images.getNewName().split("\\.");
+                            if(extension[1].equals("pdf")){
+                                htmlPage += "<tr><td><a href='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'>"+images.getImageName()+"</a></td></tr>";
+                            }else {
+                                htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+                            }
+                        }
+                        htmlPage += "</table>";
+                    }
+
+
+                    htmlPage +="<h4>reported at "+t1.getReportDate()+" by "+t1.getCategory().getCatName()+" :: "+t1.getSubCat().getSubCatName()+" titled "+t1.getTitle()+"</h4></body></html>";
+                    webEngine.loadContent(htmlPage, "text/html");
+                }
+            }
+        });
+
+        WebEngine webEngine = webView.getEngine();
+        webEngine.locationProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                // Open URL in Browser:
+                String[] extension = newValue.split("\\.");
+                if(extension.length>1){
+                    if(extension[1].equals("pdf")){
+                        try {
+                            Desktop.getDesktop().browse(new URI(newValue));
+                            //Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+newValue);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    webEngine.loadContent(htmlPage);
                 }
             }
         });
@@ -316,30 +364,6 @@ public class Filtering {
             }
         });
 
-        suggestionsList.setCellFactory(param -> new ListCell<Suggestion>(){
-            @Override
-            protected void updateItem(Suggestion suggestion, boolean b){
-                super.updateItem(suggestion, b);
-                if (b || suggestion == null || suggestion.getSuggestionText() == null) {
-                    setText(null);
-                } else {
-                    setText(suggestion.getSuggestionText());
-                }
-            }
-        });
-
-        projectsList.setCellFactory(param -> new ListCell<Project>(){
-            @Override
-            protected void updateItem(Project project, boolean b){
-                super.updateItem(project, b);
-                if (b || project == null || project.getProjectsText() == null) {
-                    setText(null);
-                } else {
-                    setText(project.getProjectsText());
-                }
-            }
-        });
-
         webView.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
@@ -361,19 +385,6 @@ public class Filtering {
             }
         });
 
-        listOfImages.setCellFactory(param -> new ListCell<UploadedImages>(){
-            @Override
-            public void updateItem(UploadedImages uploadedImages, boolean empty) {
-                super.updateItem(uploadedImages, empty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(uploadedImages.getImageName());
-                    setGraphic(uploadedImages.getImageView());
-                }
-            }
-        });
 
     }
 
@@ -391,10 +402,7 @@ public class Filtering {
 
     }
 
-    @FXML
-    private void preview(){
 
-    }
 
     @FXML
     private void export(){

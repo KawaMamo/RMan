@@ -31,11 +31,6 @@ public class AddReport {
     HTMLEditor htmlEditor;
 
     @FXML
-    private ListView<String> projectsList;
-
-    ObservableList<String> projects = FXCollections.observableArrayList();
-
-    @FXML
     private DatePicker dateTF;
 
     @FXML
@@ -76,12 +71,6 @@ public class AddReport {
     void addSuggestion() {
         suggestions.add(suggestionTF.getText());
         suggestionTF.setText(null);
-    }
-
-    @FXML
-    void addProjects() {
-        projects.add(projectsTF.getText());
-        projectsTF.setText(null);
     }
 
     Connect connect;
@@ -135,15 +124,8 @@ public class AddReport {
         });
 
 
-        projectsList.setItems(projects);
         suggestionList.setItems(suggestions);
 
-        projectsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                projectsTF.setText(t1);
-            }
-        });
 
         suggestionList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -206,22 +188,6 @@ public class AddReport {
             }
             report.setSuggestions(suggestionsArray);
 
-            List<Project> tempProject = new ArrayList<>();
-            ResultSet projectSet = connect.getProjects(report.getId());
-            while (projectSet.next()){
-                tempProject.add(new Project(projectSet.getInt("id"), report,
-                        projectSet.getString("projectsText"),
-                        LocalDate.parse(projectSet.getString("createdAt"))));
-                projects.add(projectSet.getString("projectsText"));
-            }
-
-            Project[] projectsArray = new Project[tempProject.size()];
-            int k = 0;
-            for (Project project: tempProject){
-                projectsArray[k] = project;
-                k++;
-            }
-            report.setProjects(projectsArray);
 
             ResultSet imagesSet = connect.getImages(report.getId());
             while (imagesSet.next()){
@@ -257,7 +223,6 @@ public class AddReport {
         htmlEditor.setHtmlText("");
         submitBtn.setText("Submit");
         dateTF.setValue(LocalDate.now());
-        projects.clear();
         suggestions.clear();
         titleTF.setText(null);
         categoryCB.getItems().add(null);categoryCB.setValue(null);
@@ -271,18 +236,6 @@ public class AddReport {
         suggestions.remove(suggestionList.getSelectionModel().getSelectedItem());
         suggestions.add(text);
 
-    }
-
-    @FXML
-    private void editProjects(){
-        String text = projectsTF.getText();
-        projects.remove(projectsList.getSelectionModel().getSelectedItem());
-        projects.add(text);
-    }
-
-    @FXML
-    private void deleteProjects(){
-        projects.remove(projectsList.getSelectionModel().getSelectedItem());
     }
 
     @FXML
@@ -303,15 +256,6 @@ public class AddReport {
             for (String object: suggestions){
                 try {
                     connect.addSuggestion(id, object);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
-                }
-            }
-
-            for (String object: projects){
-                try {
-                    check = connect.addProject(id, object);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
@@ -363,15 +307,6 @@ public class AddReport {
                 }
             }
 
-            for (String object: projects){
-                try {
-                    check = connect.addProject(id, object);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Notifications.create().title("Error").text(e.getMessage()).position(Pos.BOTTOM_RIGHT).showError();
-                }
-            }
-
             for (UploadedImages object : uploadedImages){
                 try {
                     check = connect.addImage(id, object.getImageName(), object.getNewName());
@@ -391,8 +326,12 @@ public class AddReport {
                 submitBtn.setText("Try Again");
             }
         }
-        reset();
 
+    }
+
+    @FXML
+    private void addNew(){
+        reset();
     }
 
     @FXML

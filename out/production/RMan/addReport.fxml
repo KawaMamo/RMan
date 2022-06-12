@@ -14,17 +14,15 @@
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="120.0" minWidth="0.0" prefWidth="118.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="60.0" valignment="CENTER" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="20.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="250.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="20.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="20.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="60.0" minHeight="60.0" valignment="CENTER" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="1.7976931348623157E308" minHeight="250.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="21.0" minHeight="20.0" prefHeight="21.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="125.0" minHeight="0.0" prefHeight="125.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
       <VBox style="-fx-border-width: 0.3; -fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="7">
@@ -45,25 +43,6 @@
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </VBox>
-      <VBox style="-fx-border-color: black; -fx-border-width: 0.3;" GridPane.columnIndex="1" GridPane.rowIndex="9">
-         <children>
-            <HBox spacing="15.0">
-               <children>
-                  <TextField fx:id="projectsTF" maxWidth="1.7976931348623157E308" prefHeight="31.0" prefWidth="433.0" />
-                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addProjects" prefHeight="31.0" prefWidth="126.0" text="Add projects" />
-                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#editProjects" prefHeight="31.0" text="Edit" />
-                  <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#deleteProjects" prefHeight="31.0" text="Delete" />
-               </children>
-               <padding>
-                  <Insets bottom="5.0" />
-               </padding>
-            </HBox>
-            <ListView fx:id="projectsList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-         </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
@@ -110,8 +89,6 @@
          </children>
       </GridPane>
       <Label text="Suggestion Section" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-      <Label text="Projects section" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-      <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#submit" prefHeight="45.0" prefWidth="86.0" text="Submit" GridPane.columnIndex="2" GridPane.rowIndex="9" />
       <Label text="Report Details" GridPane.columnIndex="1" />
       <GridPane GridPane.columnIndex="1" GridPane.rowIndex="5">
         <columnConstraints>
@@ -140,5 +117,11 @@
             </VBox>
          </children>
       </GridPane>
+      <VBox alignment="CENTER" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="7">
+         <children>
+            <Button mnemonicParsing="false" onAction="#addNew" prefHeight="45.0" prefWidth="87.0" text="Add New" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+            <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#submit" prefHeight="45.0" prefWidth="86.0" text="Submit" />
+         </children>
+      </VBox>
    </children>
 </GridPane>

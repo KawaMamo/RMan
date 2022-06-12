@@ -240,25 +240,34 @@ public class ReportsDetails {
 
                     WebEngine webEngine = webView.getEngine();
                     String reportHtml[] = t1.getReportText().split("</body>");
-                    htmlPage = reportHtml[0]+"<h1>المشاريع</h1><ol>";
-                    for (Project project: t1.getProjects()){
-                        htmlPage +="<li>"+project.getProjectsText()+"</li>";
-                    }
-                    htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
-                    for (Suggestion suggestion:t1.getSuggestions()){
-                        htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
-                    }
 
-                    htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
-                    for (UploadedImages images: t1.getUploadedImagesList()){
-                        String[] extension = images.getNewName().split("\\.");
-                        if(extension[1].equals("pdf")){
-                            htmlPage += "<tr><td><a href='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'>"+images.getImageName()+"</a></td></tr>";
-                        }else {
-                            htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+                    htmlPage = reportHtml[0];
+                    if(projectObservableList.size()>0){
+                        htmlPage = "<h1>المشاريع</h1><ol>";
+                        for (Project project: t1.getProjects()){
+                            htmlPage +="<li>"+project.getProjectsText()+"</li>";
                         }
                     }
-                    htmlPage += "</table>";
+
+                    if(suggestionObservableList.size()>0){
+                        htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
+                        for (Suggestion suggestion:t1.getSuggestions()){
+                            htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
+                        }
+                    }
+
+                    if(uploadedImagesToShow.size()>0){
+                        htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
+                        for (UploadedImages images: t1.getUploadedImagesList()){
+                            String[] extension = images.getNewName().split("\\.");
+                            if(extension[1].equals("pdf")){
+                                htmlPage += "<tr><td><a href='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'>"+images.getImageName()+"</a></td></tr>";
+                            }else {
+                                htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+                            }
+                        }
+                        htmlPage += "</table>";
+                    }
 
                     htmlPage +="<h4>reported at "+t1.getReportDate()+" by "+t1.getCategory().getCatName()+" :: "+t1.getSubCat().getSubCatName()+" titled "+t1.getTitle()+"</h4></body></html>";
                     webEngine.loadContent(htmlPage, "text/html");
