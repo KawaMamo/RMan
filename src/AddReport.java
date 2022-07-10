@@ -2,14 +2,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.stage.FileChooser;
@@ -71,6 +75,7 @@ public class AddReport {
     public static int editId = 0;
 
     public static Stage modal;
+  
 
 
     @FXML
@@ -166,6 +171,9 @@ public class AddReport {
         }else {
 
         }
+
+
+
     }
 
     private void loadReport(int editId) {
@@ -282,6 +290,7 @@ public class AddReport {
             if(id != 0){
                 Notifications.create().title("Success").text("Report details added successfully").position(Pos.BOTTOM_RIGHT).showConfirm();
                 submitBtn.setText("Add new");
+                reset();
             }else {
                 Notifications.create().title("Error").text("Something went wrong").position(Pos.TOP_LEFT).showError();
                 submitBtn.setText("Try Again");

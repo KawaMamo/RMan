@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
 
 
 public class TaskDashBoard {
@@ -44,6 +42,14 @@ public class TaskDashBoard {
     static DecimalFormat formatter = new DecimalFormat("00");
 
     static Connect connect;
+
+    @FXML
+    private TextField dutiesTF;
+
+    ObservableList<Duty> duties = FXCollections.observableArrayList();
+
+    @FXML
+    private ListView<Duty> dutiesList;
 
     @FXML
     private ListView<Duty> listOfDuties;
@@ -105,8 +111,39 @@ public class TaskDashBoard {
             }
         });
 
+        dutiesList.setCellFactory(param -> new ListCell<Duty>(){
+            @Override
+            protected void updateItem(Duty duty, boolean b){
+                super.updateItem(duty, b);
+                if (b || duty == null || duty.getDescription() == null) {
+                    setText(null);
+                } else {
+                    setText(duty.getDescription());
+                    setMaxWidth(param.getWidth());
+                    setPrefWidth(param.getWidth());
+                    setMinWidth(param.getWidth());
+                    setWrapText(true);
+                    setStyle("-fx-font-size: 20;-fx-font-weight: bold;");
+                }
+            }
+        });
 
+        dutiesList.setItems(duties);
+        try {
+            ResultSet generalDuties = connect.getGeneralDuties();
+            while (generalDuties.next()){
+                duties.add(new Duty(generalDuties.getString("description"), generalDuties.getInt("id"), null));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        dutiesList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Duty>() {
+            @Override
+            public void changed(ObservableValue<? extends Duty> observable, Duty oldValue, Duty newValue) {
+                dutiesTF.setText(newValue.getDescription());
+            }
+        });
 
     }
 
@@ -218,6 +255,41 @@ public class TaskDashBoard {
     public static void setDutyTime(int day){
         dutyTime = LocalDate.parse(year+"-"+formatter.format(month)+"-"+formatter.format(day));
         System.out.println(dutyTime.toString());
+    }
+
+    @FXML
+    private void addDuty(){
+
+        try {
+            int id = connect.addGeneralDuty(dutiesTF.getText());
+            duties.add(new Duty(dutiesTF.getText(), id, null));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        dutiesTF.setText(null);
+    }
+
+    @FXML
+    private void editDuty(){
+
+        Duty duty = dutiesList.getSelectionModel().getSelectedItem();
+        connect.deleteDuties(duty.getId());
+        try {
+            System.out.println(duty.getDescription());
+            int id = connect.addGeneralDuty(dutiesTF.getText());
+            duties.add(new Duty(dutiesTF.getText(), id, null));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        duties.remove(duty);
+
+    }
+
+    @FXML
+    private void deleteDuty(){
+        System.out.println(dutiesList.getSelectionModel().getSelectedItem().getId());
+        connect.deleteDuties(dutiesList.getSelectionModel().getSelectedItem().getId());
+        duties.remove(dutiesList.getSelectionModel().getSelectedItem());
     }
 
 }

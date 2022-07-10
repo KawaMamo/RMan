@@ -191,6 +191,31 @@ public class Connect {
         return insertedId;
     }
 
+    public int addGeneralDuty(String description) throws Exception{
+
+        int insertedId = 0;
+        try {
+            preparedStatement = connect
+                    .prepareStatement("insert into duties values (default, ?, default, default)", statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, description);
+            int rowAffected = preparedStatement.executeUpdate();
+            ResultSet rs = null;
+            if(rowAffected == 1)
+            {
+                rs = preparedStatement.getGeneratedKeys();
+                if(rs.next())
+                    insertedId = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+
+        }
+
+        return insertedId;
+    }
+
     public int addProject(int reportId, String text) throws Exception{
 
         int insertedId = 0;
@@ -301,6 +326,17 @@ public class Connect {
 
     }
 
+    public ResultSet getGeneralDuties() throws Exception {
+        ResultSet resultSet = null;
+        String query = "SELECT * FROM duties d WHERE createdAt Is NULL ORDER BY id DESC";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
+
+        return resultSet;
+
+    }
+
+
     public ResultSet getImages(int reportId) throws Exception {
         ResultSet resultSet = null;
 
@@ -366,6 +402,21 @@ public class Connect {
         try {
             preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, date.toString());
+            rowAffected = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowAffected;
+    }
+
+    public int deleteDuties(int id) {
+
+        int rowAffected = -1;
+        String query = "DELETE FROM duties WHERE id = ? ";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connect.prepareStatement(query, statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, id);
             rowAffected = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -483,6 +534,46 @@ public class Connect {
         String query = "SELECT * FROM report r" +
                 " LEFT JOIN categories c ON c.id = r.catId " +
                 " LEFT JOIN subcat s ON s.id = r.subCatId"+where+" ORDER BY r.id DESC";
+        PreparedStatement preparedStatement = connect.prepareStatement(query);
+        int i = 1;
+        for (Map.Entry<String, String> entry: whereClause.entrySet()){
+            if(entry.getKey() == "reportText"){
+                preparedStatement.setString(i, "%"+entry.getValue()+"%");
+            }else {
+                preparedStatement.setString(i, entry.getValue());
+            }
+
+            i++;
+        }
+        resultSet = preparedStatement.executeQuery();
+
+        return resultSet;
+    }
+
+    public ResultSet getReportsByDate(Map<String, String> whereClause) throws SQLException {
+        ResultSet resultSet = null;
+        String where = " ";
+        int j = 0;
+
+        for (Map.Entry<String, String> entry: whereClause.entrySet()){
+            if(j == 0){
+                where += " WHERE ";
+            }
+            if(j != 0){
+                where += " AND ";
+            }
+            if(entry.getKey()== "reportText"){
+                where += "r."+entry.getKey()+" LIKE ? ";
+            }else {
+                where += "r."+entry.getKey()+" = ? ";
+            }
+
+            j++;
+        }
+
+        String query = "SELECT * FROM report r" +
+                " LEFT JOIN categories c ON c.id = r.catId " +
+                " LEFT JOIN subcat s ON s.id = r.subCatId"+where+" ORDER BY r.reportDate DESC";
         PreparedStatement preparedStatement = connect.prepareStatement(query);
         int i = 1;
         for (Map.Entry<String, String> entry: whereClause.entrySet()){

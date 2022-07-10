@@ -15,9 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -31,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Key;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -236,14 +235,14 @@ public class Filtering {
                 if (b || report == null || report.getCategory() == null) {
                     setText(null);
                 } else {
-                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
+                    setText(report.getTitle());
                     setMaxWidth(param.getWidth());
                     setPrefWidth(param.getWidth());
                     setMinWidth(param.getWidth());
                     setWrapText(true);
                     setStyle("-fx-font-size: 18;");
                     if(report.getIsRead()==0){
-                        setStyle("-fx-font-weight: bold;");
+                        setStyle("-fx-text-fill: blue;");
                     }else if(report.getIsRead()==1){
                         setStyle("-fx-font-weight: normal;");
                     }
@@ -270,7 +269,10 @@ public class Filtering {
                     if(t1.getIsRead() == 0){
                         try {
                             connect.setAsRead(t1.getId());
+                            Report temp = t1;
+                            whereClauseArgs.put("isRead",String.valueOf(0));
                             loadReports(whereClauseArgs);
+                            reportsList.add(temp);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -339,12 +341,20 @@ public class Filtering {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getClickCount()==2){
-                    AddReport.editId = searchListView.getSelectionModel().getSelectedItems().get(0).getId();
-                    try {
-                        Main.changeScene("addReport.fxml");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    searchListView.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                        @Override
+                        public void handle(KeyEvent event) {
+                            if(event.getCode() == KeyCode.CONTROL){
+                                AddReport.editId = searchListView.getSelectionModel().getSelectedItems().get(0).getId();
+                                try {
+                                    Main.changeScene("addReport.fxml");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+
                 }else if(event.getButton().equals(MouseButton.SECONDARY)){
                     Parent root = null;
                     try {

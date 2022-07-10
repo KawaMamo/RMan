@@ -166,7 +166,7 @@ public class ReportsDetails {
     private void loadReports(Map whereClause) throws SQLException {
         reportsList.clear();
 
-        ResultSet reports = connect.getReports(whereClause);
+        ResultSet reports = connect.getReportsByDate(whereClause);
         while (reports.next()){
             CategoryClass categoryClass = new CategoryClass(reports.getString("categoryName"), reports.getInt("catId"));
             Report report = new Report(reports.getInt("id"), LocalDate.parse(reports.getString("reportDate")),
@@ -199,7 +199,7 @@ public class ReportsDetails {
                 if (b || report == null || report.getCategory() == null) {
                     setText(null);
                 } else {
-                    setText(report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" :: "+report.getTitle()+" :: "+report.getReportDate());
+                    setText(report.getTitle()+" :: "+report.getReportDate());
                     setMaxWidth(param.getWidth());
                     setPrefWidth(param.getWidth());
                     setMinWidth(param.getWidth());
@@ -308,6 +308,8 @@ public class ReportsDetails {
 
             }
         });
+
+
 
         webView.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
             @Override public void onChanged(Change<? extends Node> change) {

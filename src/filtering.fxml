@@ -44,8 +44,8 @@
       <Label text="Search in Reports" GridPane.columnIndex="3" />
       <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <children>
-            <Button mnemonicParsing="false" onAction="#reset" prefHeight="31.0" prefWidth="72.0" text="Reset" />
-            <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#search" prefHeight="31.0" prefWidth="165.0" text="Search" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Button mnemonicParsing="false" onAction="#reset" prefHeight="31.0" prefWidth="72.0" text="إعادة ضبط" />
+            <Button fx:id="searchBtn" mnemonicParsing="false" onAction="#search" prefHeight="31.0" prefWidth="165.0" text="بحث" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ChoiceBox fx:id="subCatCB" prefWidth="150.0" />
             <ChoiceBox fx:id="catCB" prefWidth="150.0" />
             <DatePicker fx:id="reportDate" />

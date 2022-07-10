@@ -1,5 +1,7 @@
 import javafx.fxml.FXML;
 
+import java.io.IOException;
+
 
 public class AreYouSureNew {
 
@@ -8,7 +10,11 @@ public class AreYouSureNew {
     private void delete(){
         status = true;
         AddReport.modal.close();
-        System.out.println("AreYouSureNew::delete");
+        try {
+            Main.changeScene("altAddReport.fxml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

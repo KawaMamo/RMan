@@ -40,26 +40,36 @@ public class PreviewToExport {
         String htmlPartOne[] = report.getReportText().split("<head>");
 
         String reportHtml[] = htmlPartOne[1].split("</body>");
-        htmlPage = "<html dir=\"ltr\"><head><meta charset=\"UTF-8\">"+reportHtml[0]+"<h1>المشاريع</h1><ol>";
-        for (Project project: report.getProjects()){
-            htmlPage +="<li>"+project.getProjectsText()+"</li>";
-        }
-        htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
-        for (Suggestion suggestion:report.getSuggestions()){
-            htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
-        }
 
-        htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
-        for (UploadedImages images: report.getUploadedImagesList()){
-            String[] extension = images.getNewName().split("\\.");
-            if(extension[1].equals("pdf")){
-                htmlPage += "<tr><td><a href='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'>"+images.getImageName()+"</a></td></tr>";
-            }else {
-                htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+        htmlPage = "<html dir=\"ltr\"><head><meta charset=\"UTF-8\">"+reportHtml[0];
+        if(report.getProjects().length>0){
+            htmlPage = "<h1>المشاريع</h1><ol>";
+            for (Project project: report.getProjects()){
+
+                htmlPage +="<li>"+project.getProjectsText()+"</li>";
             }
-
         }
-        htmlPage += "</table>";
+
+        if(report.getSuggestions().length>0){
+            htmlPage += "</ol><h1>الاقتراحات</h1><ol>";
+            for (Suggestion suggestion:report.getSuggestions()){
+                htmlPage += "<li>"+suggestion.getSuggestionText()+"</li>";
+            }
+        }
+
+        if(report.getUploadedImagesList().size()>0){
+            htmlPage += "</ol><h1>الصور المرفقة</h1><table width=\"100%\">";
+            for (UploadedImages images: report.getUploadedImagesList()){
+                String[] extension = images.getNewName().split("\\.");
+                if(extension[1].equals("pdf")){
+                    htmlPage += "<tr><td><a href='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'>"+images.getImageName()+"</a></td></tr>";
+                }else {
+                    htmlPage += "<tr><td><img src='"+config.getProp().getProperty("imageUrl")+images.getNewName()+"' width='100%'/></td></tr>";
+                }
+
+            }
+            htmlPage += "</table>";
+        }
 
         htmlPage +="<h4>reported at "+report.getReportDate()+" by "+report.getCategory().getCatName()+" :: "+report.getSubCat().getSubCatName()+" titled "+report.getTitle()+"</h4></body></html>";
         webEngine.loadContent(htmlPage, "text/html");
