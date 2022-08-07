@@ -82,8 +82,6 @@ public class Filtering {
     @FXML
     void search() {
 
-
-
         if(searchTF.getText() != null){
             whereClauseArgs.put("reportText", searchTF.getText());
         }
